@@ -1,0 +1,8 @@
+// API の バージョン指定
+@api_version = 2022-12-01
+
+###
+// サブスクリプションの一覧
+GET https://management.azure.com/subscriptions?api-version={{api_version}} HTTP/1.1
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

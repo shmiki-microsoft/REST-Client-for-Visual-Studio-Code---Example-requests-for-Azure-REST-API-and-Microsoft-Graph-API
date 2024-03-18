@@ -1,0 +1,16 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// ドメイン名からテナントIDを取得する
+@tenantId= tenant id
+GET {{graph_endpoint}}/tenantRelationships/findTenantInformationByTenantId(tenantId='{{tenantId}}')
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// テナント ID からドメイン名を取得する
+@tenantName= tenant domain name
+GET {{graph_endpoint}}/tenantRelationships/findTenantInformationByDomainName(domainName='{{tenantName}}')
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

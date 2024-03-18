@@ -1,0 +1,16 @@
+// Microsoft Entra ID の暗黙的な許可のフロー
+// https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow
+
+###
+// 認可リクエスト
+// 右クリック > Genarate Code Snippet > Powershell >  Invoke-WebRequest
+// をクリックし、-Uri　に設定されている URL をブラウザーで開いて認証する
+GET {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/authorize
+    ?client_id={{clientId}}
+    &response_type=id_token
+    &redirect_uri={{redirectUri}}
+    &response_mode=fragment
+    &scope=openid offline_access https://graph.microsoft.com/.default
+    &state=12345
+    &nonce=678910
+###

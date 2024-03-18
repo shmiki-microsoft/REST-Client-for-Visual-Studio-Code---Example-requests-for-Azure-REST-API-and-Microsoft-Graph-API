@@ -1,0 +1,110 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// グループの一覧を取得
+GET {{graph_endpoint}}/groups
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループの一覧をフィルタしたり、取得するプロパティーを選択
+GET {{graph_endpoint}}/groups
+    ?$filter=groupTypes/any(i:i eq 'Unified')
+    &$select=id,displayName,mail,expirationDateTime,groupTypes
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループの数を取得
+GET {{graph_endpoint}}/groups/$count
+ConsistencyLevel: eventual
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループのオブジェクト ID を指定してグループの情報を取得
+@groupId1= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/groups/{{groupId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループを作成
+POST {{graph_endpoint}}/groups
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "description": "Self help community for library",
+  "displayName": "Library Assist",
+  "groupTypes": [
+    "Unified"
+  ],
+  "mailEnabled": true,
+  "mailNickname": "library",
+  "securityEnabled": false
+}
+###
+
+###
+// グループのオブジェクト ID を指定してグループを更新
+@groupId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH  {{graph_endpoint}}/groups/{{groupId2}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "description": "Library Assist",
+  "displayName": "Library Assist",
+  "groupTypes": [
+    "Unified"
+  ],
+  "mailEnabled": true,
+  "mailNickname": "library-help"
+}
+###
+
+###
+// グループのオブジェクト ID を指定してグループメンバーを取得
+@groupId3= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET  {{graph_endpoint}}/groups/{{groupId3}}/members
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループのオブジェクト ID を指定してグループメンバーを追加
+@groupId4= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@userId1= yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+POST  {{graph_endpoint}}/groups/{{groupId4}}/members/$ref
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/{{userId1}}"
+}
+###
+
+###
+// グループのオブジェクト ID を指定してグループメンバーを削除
+@groupId5= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@userId2= yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+DELETE {{graph_endpoint}}/groups/{{groupId5}}/members/{{userId2}}/$ref
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+
+###
+// グループのオブジェクト ID を指定してグループを削除
+@groupId5= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE  {{graph_endpoint}}/groups/{{groupId5}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// グループのオブジェクト ID を指定して有効期限後を更新
+@groupId6= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+POST  {{graph_endpoint}}/groups/{{groupId6}}/renew
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

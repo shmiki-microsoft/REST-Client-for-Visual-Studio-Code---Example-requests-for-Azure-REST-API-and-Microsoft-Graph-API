@@ -1,0 +1,17 @@
+// API の バージョン指定
+@api_version = 2022-04-01
+
+###
+// Azure ロールの一覧を取得
+GET https://management.azure.com/subscriptions/{{subscriptionId}}/providers/Microsoft.Authorization/roleDefinitions
+    ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// RoleDefinition Id から Azure ロールを取得
+@roleDefinitionId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET https://management.azure.com/subscriptions/{{subscriptionId}}/providers/Microsoft.Authorization/roleDefinitions/{{roleDefinitionId}}
+    ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

@@ -1,0 +1,54 @@
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// ユーザーの一覧を取得
+GET {{graph_endpoint}}/users
+    ?$filter=userType eq 'member'
+    &$select=id,displayName,mail,userPrincipalName
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//ユーザーのオブジェクト ID を指定してユーザーの情報を取得
+@userId1= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/users/{{userId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// ユーザーの作成
+POST {{graph_endpoint}}/users
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "accountEnabled": true,
+  "displayName": "Adele Vance",
+  "mailNickname": "AdeleV",
+  "userPrincipalName": "AdeleV@contoso.com",
+  "passwordProfile" : {
+    "forceChangePasswordNextSignIn": true,
+    "password": "password-value"
+  }
+}
+###
+
+###
+// ユーザーのオブジェクト ID を指定してユーザーの情報を更新
+@userId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+PATCH {{graph_endpoint}}/users/{{userId2}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+ "displayName": "Adele Vance Contoso",
+  "officeLocation": "18/2111"
+}
+###
+
+###
+// ユーザーのオブジェクト ID を指定してユーザーを削除
+@userId3= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+DELETE {{graph_endpoint}}/users/{{userId3}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

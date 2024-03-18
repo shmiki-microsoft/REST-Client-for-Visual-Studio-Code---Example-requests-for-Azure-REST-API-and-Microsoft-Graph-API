@@ -1,0 +1,42 @@
+// API の バージョン指定
+@api_version = 2022-04-01
+
+###
+// リソースグループの RBAC の一覧を取得
+@resourceGroupName1 = test
+GET https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName1}}/providers/Microsoft.Authorization/roleAssignments
+    ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// 特定のユーザーに指定したリソースグループのスコープで閲覧者ロールを割り当てる
+@resourceGroupName2 = test
+// ユーザーやサービス プリンシパル、グループのオブジェクトID
+@principalId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+// ロール定義のID
+@roleDefinitionId1 = yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+
+PUT https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName2}}/providers/Microsoft.Authorization/roleAssignments/{{$guid}}
+    ?api-version={{api_version}}
+Content-Type: application/json    
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "properties": {
+    "roleDefinitionId": "/subscriptions/{{subscriptionId}}/providers/Microsoft.Authorization/roleDefinitions/{{roleDefinitionId1}}",
+    "principalId": "{{principalId1}}",
+    "principalType": "User"
+  }
+}
+###
+
+###
+// 特定のユーザーに指定したリソースグループのスコープのロール割り当てを削除
+@resourceGroupName3 = test
+// RoleAssignment ID (リソースグループの RBAC の一覧などから取得)
+@roleAssignmentId = zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzz
+DELETE https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName3}}/providers/Microsoft.Authorization/roleAssignments/{{roleAssignmentId}}
+    ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

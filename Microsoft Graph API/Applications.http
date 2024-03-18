@@ -1,0 +1,81 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// アプリケーションの一覧を取得
+GET {{graph_endpoint}}/applications
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// appId でアプリケーションをフィルタしたり、取得するプロパティーを選択
+GET {{graph_endpoint}}/applications
+    ?$filter=appId eq 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+    &$select=id,displayName,appid,signInAudience,passwordCredentials
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// アプリケーションのオブジェクト ID を指定してアプリケーションの情報を取得
+@appObjectId1= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/applications/{{appObjectId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//アプリケーションの作成
+POST {{graph_endpoint}}/applications
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "Display name"
+}
+###
+
+###
+//アプリケーションのオブジェクト ID を指定して更新
+@appObjectId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH https://graph.microsoft.com/v1.0/applications/{{appObjectId2}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "New display name"
+}
+###
+
+###
+//アプリケーションのオブジェクト ID を指定して削除
+@appObjectId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE https://graph.microsoft.com/v1.0/applications/{{appObjectId2}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//アプリケーションのオブジェクト ID を指定してクライアントシークレットを作成
+@appObjectId3= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+POST https://graph.microsoft.com/v1.0/applications/{{appObjectId3}}/addPassword
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "passwordCredential": {
+    "displayName": "Password friendly name"
+  }
+}
+###
+
+###
+//アプリケーションのオブジェクト ID を指定してクライアントシークレットを削除
+@appObjectId4= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@keyId1 = yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy
+POST https://graph.microsoft.com/v1.0/applications/{{appObjectId4}}/removePassword
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "keyId": "{{keyId1}}"
+}
+###

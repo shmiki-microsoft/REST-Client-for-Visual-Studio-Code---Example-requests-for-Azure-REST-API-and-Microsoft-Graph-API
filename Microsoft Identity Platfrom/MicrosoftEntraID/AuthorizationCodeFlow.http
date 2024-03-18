@@ -1,0 +1,52 @@
+// Microsoft Entra ID の認可コードフロー
+// https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow
+
+
+###
+// 認可リクエスト
+// 右クリック > Genarate Code Snippet > Powershell >  Invoke-WebRequest
+// をクリックし、-Uri　に設定されている URL をブラウザーで開いて認証する
+GET {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/authorize
+    ?client_id={{clientId}}
+    &response_type=code
+    &redirect_uri={{redirectUri}}
+    &response_mode=query
+    &scope=openid offline_access https://graph.microsoft.com/.default
+    &state=12345
+###
+
+###
+// トークンリクエスト
+// 認可リクエストで Microsoft Entra ID の認証後にURL から code を取得する
+@code = 認可リクエストで取得したcodeを入力
+POST {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}
+&scope=openid offline_access https://graph.microsoft.com/.default
+&code={{code}}
+&redirect_uri={{redirectUri}}
+&grant_type=authorization_code
+&client_secret={{clientSecret}}
+###
+
+###
+// リフレッシュトークンフロー
+@refreshToken = トークンリクエストで取得したrefresh_tokenを入力
+POST {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}
+&scope=openid offline_access https://graph.microsoft.com/.default
+&refresh_token={{refreshToken}}
+&redirect_uri={{redirectUri}}
+&grant_type=refresh_token
+&client_secret={{clientSecret}}
+###
+
+###
+// UserInfo Endpoint
+@accessToken = トークンリクエストで取得したaccess_tokenを入力
+GET https://graph.microsoft.com/oidc/userinfo
+Authorization: Bearer {{accessToken}}
+###
