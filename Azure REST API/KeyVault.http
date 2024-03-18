@@ -1,0 +1,117 @@
+// API の バージョン指定
+@api_version = 2023-07-01
+###
+// List
+GET https://management.azure.com/subscriptions/{{subscriptionId}}/providers/Microsoft.KeyVault/vaults
+        ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// GET
+@resourceGroupName1=test
+@vaultName1=my-vault
+GET https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName1}}/providers/Microsoft.KeyVault/vaults/{{vaultName1}}
+        ?api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// Check Name Availability
+POST https://management.azure.com/subscriptions/{{subscriptionId}}/providers/Microsoft.KeyVault/checkNameAvailability
+        ?api-version={{api_version}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "name": "my-vault",
+  "type": "Microsoft.KeyVault/vaults"
+}
+###
+
+###
+// Create Or Update
+@resourceGroupName2=test
+@vaultName2=my-vault
+PUT https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName2}}/providers/Microsoft.KeyVault/vaults/{{vaultName2}}
+        ?api-version={{api_version}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "location": "westus",
+  "properties": {
+    "tenantId": "{{aadV2TenantId}}",
+    "sku": {
+      "family": "A",
+      "name": "standard"
+    },
+    "accessPolicies": [
+      {
+        "tenantId": "{{aadV2TenantId}}",
+        "objectId": "00000000-0000-0000-0000-000000000000",
+        "permissions": {
+          "keys": [
+            "encrypt",
+            "decrypt",
+            "wrapKey",
+            "unwrapKey",
+            "sign",
+            "verify",
+            "get",
+            "list",
+            "create",
+            "update",
+            "import",
+            "delete",
+            "backup",
+            "restore",
+            "recover",
+            "purge"
+          ],
+          "secrets": [
+            "get",
+            "list",
+            "set",
+            "delete",
+            "backup",
+            "restore",
+            "recover",
+            "purge"
+          ],
+          "certificates": [
+            "get",
+            "list",
+            "delete",
+            "create",
+            "import",
+            "update",
+            "managecontacts",
+            "getissuers",
+            "listissuers",
+            "setissuers",
+            "deleteissuers",
+            "manageissuers",
+            "recover",
+            "purge"
+          ]
+        }
+      }
+    ],
+    "enabledForDeployment": true,
+    "enabledForDiskEncryption": true,
+    "enabledForTemplateDeployment": true,
+    "publicNetworkAccess": "Enabled"
+  }
+}
+###
+
+###
+// DELETE
+@resourceGroupName3=test
+@vaultName3=my-vault2
+DELETE https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName3}}/providers/Microsoft.KeyVault/vaults/{{vaultName3}}
+        ?$filter=resourceType eq 'Microsoft.KeyVault/vaults'
+        &api-version={{api_version}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
