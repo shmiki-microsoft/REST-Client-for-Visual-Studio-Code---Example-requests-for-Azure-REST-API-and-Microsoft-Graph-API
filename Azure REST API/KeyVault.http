@@ -111,7 +111,6 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 @resourceGroupName3=test
 @vaultName3=my-vault2
 DELETE https://management.azure.com/subscriptions/{{subscriptionId}}/resourceGroups/{{resourceGroupName3}}/providers/Microsoft.KeyVault/vaults/{{vaultName3}}
-        ?$filter=resourceType eq 'Microsoft.KeyVault/vaults'
-        &api-version={{api_version}}
+        ?api-version={{api_version}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
