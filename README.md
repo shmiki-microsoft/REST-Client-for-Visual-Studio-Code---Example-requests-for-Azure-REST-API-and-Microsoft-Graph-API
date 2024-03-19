@@ -3,7 +3,7 @@ VS Code の拡張機能 Rest Client を使って、 Azure REST API や Microsoft
 各 API の具体的なリクエストの例を公開するレポジトリです。
 
 * /Azure REST API : Azure REST API のサンプルが入っています。
-* /Microsoft Graph API : Microsoft Graph のサンプルが入っています。
+* /Microsoft Graph API : Microsoft Graph API のサンプルが入っています。
 * /Microsoft Identity Platform : Microsoft Entra ID の OAuth/OIDC を勉強したい方に向けたサンプルです。 Microsoft Entra ID で OAuth / OIDC の各種認証フロー簡単に試すためのサンプルが入っています。
 
 # インストールと事前準備
@@ -22,6 +22,8 @@ https://portal.azure.com にアクセスし、 [Microsoft Entra ID] > [アプリ
 生成されたクライアントシークレットの値の列ををメモしておきます。
 ![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/c2f56ff0-381c-4de8-af94-f1806c8e3a44)
 
+#### [Microsoft Graph API 向けの設定]
+Microsoft Graph API 向けに使用する場合は、以下の設定も行います。 Azure REST API や Microsoft Identity Platform 向けに使用する場合はこの手順をスキップできます。
 [API のアクセス許可] にて Microsoft Graph API に必要なアクセス許可を **"アプリケーションの許可"** として追加し [{ドメイン名} に管理者の同意を与えます] をクリックする
 必要なアクセス許可は Microsoft Graph API の各 API のアクセス許可のセクションで確認できます。
 https://learn.microsoft.com/ja-jp/graph/api/user-list?view=graph-rest-1.0&tabs=http#permissions
@@ -31,6 +33,13 @@ Microsoft Graph PowerShell のコマンドから確認したい場合は
 Find-MgGraphCommand  コマンドが便利です。使い方は公開情報を参照ください。
 https://learn.microsoft.com/en-us/powershell/microsoftgraph/find-mg-graph-command?view=graph-powershell-1.0
 
+#### [Azure REST API 向けの設定]
+Microsoft Graph API 向けに使用する場合は、以下の設定も行います。 Azure REST API や Microsoft Identity Platform 向けに使用する場合はこの手順をスキップできます。
+アプリ登録したアプリに対して Azure ロールの権限を割り当てます。 (Azure の RBAC という仕組みを使います)
+詳細は、
+https://learn.microsoft.com/ja-jp/azure/role-based-access-control/role-assignments-portal?tabs=delegate-condition
+
+#### [Microsoft Identity Platform 向けの設定]
 Microsoft Identity Platform 向けに使用する場合は、以下の設定も行います。 Azure REST API や Microsof Graph API 向けに使用する場合はこの手順をスキップできます。
 [認証] > [プラットフォームを追加] > [Web] をクリックします。
 リダイレクト URI に http://jwt.ms を入力し、さらにアクセス トークン (暗黙的なフローに使用)と
@@ -47,7 +56,7 @@ VS Code の拡張機能 Rest Client で使用する環境変数 (Microsoft Entra
 Environment Variables の項目の settings.json で編集をクリックします。
 ![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/3fb0a5b8-233a-4b5a-a74c-c13921c7a144)
 
-[Graph API 向けの設定]
+#### [Microsoft Graph API 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
 "rest-client.environmentVariables": {
@@ -61,7 +70,7 @@ rest-client.environmentVariables の項目に下記を記載
 ```
 aadV2AppUri は OAuth / OIDC の Scope や resorce パラメータに当たる値になります。
 
-[Azure REST API 向けの設定]
+#### [Azure REST API 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
 "rest-client.environmentVariables": {
@@ -74,7 +83,9 @@ rest-client.environmentVariables の項目に下記を記載
     }
 }
 ```
-[Microsoft Identity Platform 向けの設定]
+(aadV2AppUri は OAuth / OIDC の Scope や resorce パラメータに当たる値になります。Azure REST API の場合は API ごとに異なる場合があるので適宜修正してご使用ください)
+
+#### [Microsoft Identity Platform 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
 "rest-client.environmentVariables": {
@@ -87,16 +98,14 @@ rest-client.environmentVariables の項目に下記を記載
     },
 }
 ```
-(aadV2AppUri は OAuth / OIDC の Scope や resorce パラメータに当たる値になります。)
-設定例を以下に示します。
+#### 設定例
 ![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/d6c8701f-0077-4246-b340-d06f8f159864)
-
 
 # 使い方
 ## 新しい API のリクエストの作成方法
 .http 拡張子のファイルを作成する
 下記のように API のリクエスト内容を記載する
-[Graph API の場合]
+#### [Graph API の場合]
 "###" の間に Microsoft Graph API の HTTP リクエストを記載
 Authorization ヘッダーには 必ず Bearer {{$aadV2Token appOnly}} と記載する
 ```
@@ -110,7 +119,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 ```
 
-[Azure REST API の場合]
+#### [Azure REST API の場合]
 "###" の間に Azure REST API の HTTP リクエストを記載
 Authorization ヘッダーには 必ず Bearer {{$aadV2Token appOnly}} と記載する
 ```
@@ -135,6 +144,7 @@ Send Request を押すと API のリクエストが実行されます。その�
 ## API のリクエストからコードを自動生成する方法。
 各言語の標準ライブラリを使ったコードを自動生成させることができます。
 記述された API のリクエスト上で右クリックし、 [Generate Code Snippet] をクリックすることで各言語の標準ライブラリを使ったコードが生成されます。
+
 ![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/93c93982-a84e-4c95-bb7c-85ee36fefc99)
 
 Azure SDK や Microsoft Graph SDK などといった Microsoft 社から提供されているライブラリを使用したいときは公式ドキュメントを参照したり、
