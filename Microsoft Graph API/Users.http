@@ -53,3 +53,10 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 DELETE {{graph_endpoint}}/users/{{userId3}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
+
+###
+// ユーザーのメンバーシップを一覧表示する (直接および推移的)
+@userId4= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/users/{{userId4}}/transitiveMemberOf
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
