@@ -101,7 +101,17 @@ rest-client.environmentVariables の項目に下記を記載
 #### 設定例
 ![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/d6c8701f-0077-4246-b340-d06f8f159864)
 
+## 本ソースコードをダウンロードします。
+以下のようにして ZIP ファイルをダウンロードし、展開したら、展開後にできたフォルダーを VS Code で開きます。
+![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/4e88bd2d-b6cf-4374-9154-46dc58943cd2)
+
 # 使い方
+## ダウンロードしたサンプルを使用する
+使用したいサンプルのファイルをVS Code のエスクプローラーから開き、
+使用したいリクエストの上に表示される [Send Request] というボタンをクリックすることで
+Graph API などのリクエストを行うことができます。
+![image](https://github.com/shmiki-microsoft/REST-Client-for-Visual-Studio-Code---Example-requests-for-Azure-REST-API-and-Microsoft-Graph-API/assets/74346899/1165764a-2816-4ba7-ae93-1415893896ff)
+
 ## 新しい API のリクエストの作成方法
 .http 拡張子のファイルを作成する
 下記のように API のリクエスト内容を記載する
