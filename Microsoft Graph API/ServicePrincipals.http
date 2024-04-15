@@ -1,0 +1,17 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// サービスプリンシパルの一覧を取得
+GET {{graph_endpoint}}/servicePrincipals
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// サービスプリンシパルの数を取得
+GET {{graph_endpoint}}/servicePrincipals
+    ?$count=true
+Authorization: Bearer {{$aadV2Token appOnly}}
+ConsistencyLevel: eventual
+###
+
