@@ -1,0 +1,8 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// 同意の一覧を取得
+GET {{graph_endpoint}}/oauth2PermissionGrants
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
