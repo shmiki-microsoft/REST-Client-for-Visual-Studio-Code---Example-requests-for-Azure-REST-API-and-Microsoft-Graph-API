@@ -1,0 +1,145 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+//claimsMappingPolicy
+//https://learn.microsoft.com/en-us/graph/api/resources/claimsmappingpolicy?view=graph-rest-1.0
+###
+// claimsMappingPolicies の一覧を取得
+GET {{graph_endpoint}}/policies/claimsMappingPolicies
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// claimsMappingPolicies のオブジェクト ID を指定して特定のポリシーを取得
+@claimsMappingPolicyId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/policies/claimsMappingPolicies/{{claimsMappingPolicyId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// claimsMappingPolicies の作成
+POST {{graph_endpoint}}/policies/claimsMappingPolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "displayName": "Test1234",
+    "definition": [
+        "{
+            \"ClaimsMappingPolicy\":
+                {
+                    \"Version\":1,
+                    \"IncludeBasicClaimSet\":\"true\",
+                    \"ClaimsSchema\": 
+                        [  
+                            {
+                                \"Source\":\"user\",
+                                \"ID\":\"employeeid\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/employeeid\",
+                                \"JwtClaimType\":\"employeeid\"
+                            },
+                            {
+                                \"Source\":\"company\",
+                                \"ID\":\"tenantcountry\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country\",
+                                \"JwtClaimType\":\"country\"
+                            },
+                                                        {
+                                \"Source\":\"user\",
+                                \"ID\":\"accountEnabled\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/accountEnabled\",
+                                \"JwtClaimType\":\"accountEnabled\"
+                            }
+                        ]
+                }
+        }"
+    ]
+}
+###
+
+###
+// claimsMappingPolicies の更新
+@claimsMappingPolicyId2 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+PATCH {{graph_endpoint}}/policies/claimsMappingPolicies/{{claimsMappingPolicyId2}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "displayName": "Test1234",
+    "definition": [
+        "{
+            \"ClaimsMappingPolicy\":
+                {
+                    \"Version\":1,
+                    \"IncludeBasicClaimSet\":\"true\",
+                    \"ClaimsSchema\": 
+                        [  
+                            {
+                                \"Source\":\"user\",
+                                \"ID\":\"employeeid\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/employeeid\",
+                                \"JwtClaimType\":\"employeeid\"
+                            },
+                            {
+                                \"Source\":\"company\",
+                                \"ID\":\"tenantcountry\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/country\",
+                                \"JwtClaimType\":\"country\"
+                            },
+                                                        {
+                                \"Source\":\"user\",
+                                \"ID\":\"accountEnabled\",
+                                \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/accountEnabled\",
+                                \"JwtClaimType\":\"accountEnabled\"
+                            }
+                        ]
+                }
+        }"
+    ]
+}
+###
+
+###
+// claimsMappingPolicies の削除
+@claimsMappingPolicyId3 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+DELETE {{graph_endpoint}}/policies/claimsMappingPolicies/{{claimsMappingPolicyId3}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// claimsMappingPolicies の割り当て一覧
+//https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-claimsmappingpolicies?view=graph-rest-1.0&tabs=http
+@servicePrincipalsObjectId1= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId1}}/claimsMappingPolicies/$ref
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// サービスプリンシパルに claimsMappingPolicies を割り当てる
+//https://learn.microsoft.com/en-us/graph/api/serviceprincipal-post-claimsmappingpolicies?view=graph-rest-1.0&tabs=http
+@servicePrincipalsObjectId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@claimsMappingPolicyId4 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+POST {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId2}}/claimsMappingPolicies/$ref
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+"@odata.id":"https://graph.microsoft.com/v1.0/policies/claimsMappingPolicies/{{claimsMappingPolicyId4}}"
+}
+###
+
+###
+// サービスプリンシパルに 割り当てた claimsMappingPolicies を解除する
+//https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete-claimsmappingpolicies?view=graph-rest-1.0&tabs=http
+@servicePrincipalsObjectId3=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@claimsMappingPolicyId5 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId3}}/claimsMappingPolicies/{{claimsMappingPolicyId5}}/$ref
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+

@@ -15,3 +15,9 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 ConsistencyLevel: eventual
 ###
 
+###
+// サービスプリンシパルのオブジェクトID を指定して情報を取得
+@servicePrincipalId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/servicePrincipals/{{servicePrincipalId}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
