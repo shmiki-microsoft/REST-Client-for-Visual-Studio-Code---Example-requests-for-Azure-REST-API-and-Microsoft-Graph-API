@@ -17,7 +17,7 @@ GET {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/authorize
 
 ###
 // トークンリクエスト
-// 認可リクエストで Microsoft Entra ID の認証後にURL から code を取得する
+// 認可リクエストにて Microsoft Entra ID の認証後にリダイレクトされたURL からクエリストリングの code の値を取得
 @code = 認可リクエストで取得したcodeを入力
 POST {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
