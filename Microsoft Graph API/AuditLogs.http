@@ -1,0 +1,22 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// サインインログの一覧を取得
+GET {{graph_endpoint}}/auditLogs/signIns
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// サインインログを時間でフィルタして取得
+GET {{graph_endpoint}}/auditLogs/signIns
+?$filter="createdDateTime ge 2020-01-01T00:00:00Z and createdDateTime le 2020-01-31T23:59:59Z"
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// サインインログをuserPrincipalNameでフィルタして取得
+GET {{graph_endpoint}}/auditLogs/signIns
+?$filter=userPrincipalName eq 'test@contoso.com'
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

@@ -1,0 +1,9 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// organizationalBranding一覧を取得
+@tenantId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/organization/{{tenantId}}/branding
+Authorization: Bearer {{$aadV2Token appOnly}}
+###

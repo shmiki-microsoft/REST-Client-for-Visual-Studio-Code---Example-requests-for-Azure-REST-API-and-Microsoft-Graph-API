@@ -59,6 +59,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 
 ###
 // claimsMappingPolicies の更新
+//MemberOf で特定のグループに所属しているユーザーの場合にだけクレームを付与することができる
 @claimsMappingPolicyId2 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 PATCH {{graph_endpoint}}/policies/claimsMappingPolicies/{{claimsMappingPolicyId2}}
@@ -91,7 +92,8 @@ Authorization: Bearer {{$aadV2Token appOnly}}
                                 \"Source\":\"user\",
                                 \"ID\":\"accountEnabled\",
                                 \"SamlClaimType\":\"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/accountEnabled\",
-                                \"JwtClaimType\":\"accountEnabled\"
+                                \"JwtClaimType\":\"accountEnabled\",
+                                \"MemberOf\":[\"oid:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"]
                             }
                         ]
                 }
