@@ -145,3 +145,87 @@ Content-Type: application/json
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
+###
+// アクセストークンの有効期限のポリシー作成
+POST {{graph_endpoint}}/policies/tokenLifetimePolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "definition": [
+        "{\"TokenLifetimePolicy\":{\"Version\":1,\"AccessTokenLifetime\":\"8:00:00\"}}"
+    ],
+    "displayName": "Contoso token lifetime policy",
+    "isOrganizationDefault": false
+}
+###
+
+###
+// アクセストークンの有効期限のポリシー一覧取得
+GET {{graph_endpoint}}/policies/tokenLifetimePolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// アクセストークンの有効期限のポリシーの取得
+@tokenLifetimePolicyId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/policies/tokenLifetimePolicies/{{tokenLifetimePolicyId1}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// アクセストークンの有効期限のポリシーの更新
+@tokenLifetimePolicyId2 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH {{graph_endpoint}}/policies/tokenLifetimePolicies/{{tokenLifetimePolicyId2}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "definition": [
+        "{\"TokenLifetimePolicy\":{\"Version\":1,\"AccessTokenLifetime\":\"8:00:00\"}}"
+    ],
+    "displayName": "Contoso token lifetime policy",
+    "isOrganizationDefault": false
+}
+###
+
+###
+// アクセストークンの有効期限のポリシーの削除
+@tokenLifetimePolicyId3 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE {{graph_endpoint}}/policies/tokenLifetimePolicies/{{tokenLifetimePolicyId3}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// アクセストークンの有効期限のポリシーをサービスプリンシパルに割り当てる
+@tokenLifetimePolicyId4=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@servicePrincipalsObjectId4=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+POST {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId4}}/tokenLifetimePolicies/$ref
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "@odata.id":"https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies/{{tokenLifetimePolicyId4}}"
+}
+
+###
+
+###
+// サービスプリンシパルに割り当てられたアクセストークンの有効期限のポリシーの一覧取得
+@servicePrincipalsObjectId5=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId5}}/tokenLifetimePolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// アクセストークンの有効期限のポリシーをサービスプリンシパルの割り当て削除
+@tokenLifetimePolicyId4=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@servicePrincipalsObjectId6=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId4}}/tokenLifetimePolicies/{{tokenLifetimePolicyId4}}/$ref
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
