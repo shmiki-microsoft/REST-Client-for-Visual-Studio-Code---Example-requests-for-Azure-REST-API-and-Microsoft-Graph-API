@@ -1,0 +1,122 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+
+###
+// 認証方法の一覧を取得
+@userId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId1}}/authentication/methods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の emailMethods の一覧を取得
+@userId2 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId2}}/authentication/emailMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の fido2AuthenticationMethod の一覧を取得
+@userId3 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId3}}/authentication/fido2Methods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の microsoftAuthenticatorAuthenticationMethods の一覧を取得
+@userId4 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId4}}/authentication/microsoftAuthenticatorMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の passwordAuthenticationMethod の一覧を取得
+@userId5 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId5}}/authentication/passwordMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の phoneMethods の 一覧を取得
+@userId6 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId6}}/authentication/phoneMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の softwareOathMethods の 一覧を取得
+@userId7 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId7}}/authentication/softwareOathMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の softwareOathMethods の 一覧を取得
+@userId8 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+GET {{graph_endpoint}}/users/{{userId8}}/authentication/temporaryAccessPassMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の windowsHelloForBusinessAuthenticationMethods の 一覧を取得
+@userId9 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+GET {{graph_endpoint}}/users/{{userId9}}/authentication/windowsHelloForBusinessMethods
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+
+###
+// 認証方法の phoneMethods の更新
+@userId10 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@phoneMethodId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH {{graph_endpoint}}/users/{{userId10}}/authentication/phoneMethods/{{phoneMethodId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+
+{
+  "phoneNumber": "+81 9093241477",
+  "phoneType": "mobile",
+}
+###
+
+###
+// 認証方法の phoneMethods の削除
+@userId11= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@phoneMethodId2 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE {{graph_endpoint}}/users/{{userId11}}/authentication/phoneMethods/{{phoneMethodId2}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の状態を取得 (beta のみ)
+@userId12 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/users/{{userId12}}/authentication/signInPreferences
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// 認証方法の状態を更新 (beta のみ)
+@userId13 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH  {{graph_endpoint}}/users/{{userId13}}/authentication/signInPreferences
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+
+//{"userPreferredMethodForSecondaryAuthentication":"voiceMobile"}
+{"userPreferredMethodForSecondaryAuthentication":"voiceAlternateMobile"}
+//{"userPreferredMethodForSecondaryAuthentication":"sms"}
+###
+
