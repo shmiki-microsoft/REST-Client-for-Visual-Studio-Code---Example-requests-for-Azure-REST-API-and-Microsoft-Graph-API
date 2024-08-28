@@ -1,0 +1,9 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/beta
+
+###
+// アプリケーション アクティビティ一覧を取得
+@period = D30
+GET {{graph_endpoint}}/reports/getAzureADApplicationSignInSummary(period='{{period}}')
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
