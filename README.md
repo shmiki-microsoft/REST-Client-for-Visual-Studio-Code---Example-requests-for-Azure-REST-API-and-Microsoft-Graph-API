@@ -59,7 +59,8 @@ Environment Variables の項目の settings.json で編集をクリックしま�
 #### [Microsoft Graph API 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
-"rest-client.environmentVariables": {
+"{
+rest-client.environmentVariables": {
     "環境変数の名前": {
         "aadV2TenantId": "テナントID",
         "aadV2ClientId" : "クライアントID",
@@ -67,13 +68,15 @@ rest-client.environmentVariables の項目に下記を記載
         "aadV2AppUri" : "https://graph.microsoft.com",
     }
 }
+}
 ```
 aadV2AppUri は OAuth / OIDC の Scope や resorce パラメータに当たる値になります。
 
 #### [Azure REST API 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
-"rest-client.environmentVariables": {
+"{
+rest-client.environmentVariables": {
     "環境変数の名前": {
         "aadV2TenantId": "テナントID",
         "aadV2ClientId" : "クライアントID",
@@ -82,13 +85,15 @@ rest-client.environmentVariables の項目に下記を記載
         "subscriptionId" : "サブスクリプションID",
     }
 }
+}
 ```
 (aadV2AppUri は OAuth / OIDC の Scope や resorce パラメータに当たる値になります。Azure REST API の場合は API ごとに異なる場合があるので適宜修正してご使用ください)
 
 #### [Microsoft Identity Platform 向けの設定]
 rest-client.environmentVariables の項目に下記を記載
 ```json:settings.json
-"rest-client.environmentVariables": {
+"{
+rest-client.environmentVariables": {
     "環境変数の名前": {
         "baseUrl": "https://login.microsoftonline.com",
         "tenantId_or_tenantName" : "テナント ID もしくは テナント名",
@@ -96,6 +101,7 @@ rest-client.environmentVariables の項目に下記を記載
         "clientSecret" :"クライアントシークレットの値",
         "redirectUri": "https://jwt.ms"
     },
+}
 }
 ```
 #### 設定例
