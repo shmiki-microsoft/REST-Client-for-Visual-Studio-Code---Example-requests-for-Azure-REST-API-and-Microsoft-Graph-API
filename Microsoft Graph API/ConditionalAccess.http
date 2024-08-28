@@ -1,0 +1,8 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+
+###
+// 条件付きアクセスポリシーの一覧を取得
+GET {{graph_endpoint}}/identity/conditionalAccess/policies
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
