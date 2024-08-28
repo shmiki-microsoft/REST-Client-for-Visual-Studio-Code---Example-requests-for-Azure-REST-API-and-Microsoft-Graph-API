@@ -1,0 +1,8 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/v1.0
+###
+@appId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/applicationTemplates
+    ?$filter= id eq '{{appId}}'
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
