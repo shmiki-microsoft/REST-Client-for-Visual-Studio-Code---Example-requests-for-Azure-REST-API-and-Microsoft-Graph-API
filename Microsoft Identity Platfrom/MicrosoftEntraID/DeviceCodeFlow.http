@@ -1,0 +1,31 @@
+###
+// デバイス認可リクエスト
+# @name deviceAuthnResponse
+POST {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/devicecode
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}
+&scope=openid email profile
+###
+
+###
+//ブラウザで https://microsoft.com/devicelogin を開き user_code の値を挿入
+###
+
+###
+// ユーザーの認証
+# @name userAuthResponse
+POST {{baseUrl}}/{{tenantId_or_tenantName}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{clientId}}
+&grant_type=urn:ietf:params:oauth:grant-type:device_code
+&device_code={{deviceAuthnResponse.response.body.$.device_code}}
+###
+
+###
+// UserInfo Endpoint
+@accessToken = {{userAuthResponse.response.body.$.access_token}}
+GET https://graph.microsoft.com/v1.0/me
+Authorization: Bearer {{accessToken}}
+###
