@@ -6,3 +6,54 @@
 GET {{graph_endpoint}}/oauth2PermissionGrants
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
+
+###
+// 同意の一覧を取得 (フィルター)
+GET {{graph_endpoint}}/oauth2PermissionGrants
+?$filter=clientId eq 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// 同意の取得 (id 指定)
+@id1 = xxxxxxxxxxxxxxxxxxxxxxxxxxx
+GET {{graph_endpoint}}/oauth2PermissionGrants/{{id1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// 同意の新規作成
+@resourceServicePrincipalObjectId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@clientServicePrincipalObjectId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@principalObjectId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+POST {{graph_endpoint}}/oauth2PermissionGrants
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-Type: application/json
+{
+    "clientId": "{{clientServicePrincipalObjectId1}}",
+    "consentType": "Principal",
+    "principalId": "{{principalObjectId1}}",
+    "resourceId": "{{resourceServicePrincipalObjectId1}}",
+    "scope": "openid profile User.Read",
+}
+###
+
+###
+// 同意の更新
+@id2 = xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+PATCH {{graph_endpoint}}/oauth2PermissionGrants/{{id2}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-Type: application/json
+{
+    "scope": "openid profile offline_access User.Read"
+}
+###
+
+
+###
+// 同意の削除
+@id3 = xxxxxxxxxxxxxxxxxxxxxxxxxxx
+DELETE {{graph_endpoint}}/oauth2PermissionGrants/{{id3}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
