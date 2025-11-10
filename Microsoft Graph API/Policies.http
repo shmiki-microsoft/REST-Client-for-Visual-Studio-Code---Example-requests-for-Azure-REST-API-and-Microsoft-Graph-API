@@ -229,3 +229,352 @@ DELETE {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId4}}/token
 Content-Type: application/json
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
+
+###
+// customClaimsPolicy の一覧取得
+@servicePrincipalsObjectId7=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId7}}/claimsPolicy
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// customClaimsPolicy の更新
+@servicePrincipalsObjectId8=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH  {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId8}}/claimsPolicy
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "claims": [
+    {
+      "@odata.type": "#microsoft.graph.samlNameIdClaim",
+      "serviceProviderNameQualifier": null,
+      "nameIdFormat": "emailAddress",
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "userprincipalname",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "givenname",
+      "namespace": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims",
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "givenname",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "surname",
+      "namespace": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims",
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "surname",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "emailaddress",
+      "namespace": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims",
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "mail",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "name",
+      "namespace": "http://schemas.xmlsoap.org/ws/2005/05/identity/claims",
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "userprincipalname",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+    {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "appproxy_test",
+      "namespace": null,
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "accountenabled",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    },
+        {
+      "@odata.type": "#microsoft.graph.customClaim",
+      "name": "appproxy_test3",
+      "namespace": null,
+      "tokenFormat": [
+        "saml",
+        "jwt"
+      ],
+      "samlAttributeNameFormat": null,
+      "configurations": [
+        {
+          "condition": null,
+          "attribute": {
+            "@odata.type": "#microsoft.graph.sourcedAttribute",
+            "id": "city",
+            "source": "user",
+            "isExtensionAttribute": false
+          },
+          "transformations": []
+        }
+      ]
+    }
+  ]
+}
+###
+
+###
+// claimsPolicy を作成または置換する
+@servicePrincipalsObjectId9=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PUT  {{graph_endpoint}}/servicePrincipals/{{servicePrincipalsObjectId9}}/claimsPolicy
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "claims": [
+        {
+            "@odata.type": "#microsoft.graph.customClaim",
+            "name": "appproxy_test3",
+            "namespace": null,
+            "tokenFormat": [
+                "saml",
+                "jwt"
+            ],
+            "samlAttributeNameFormat": null,
+            "configurations": [
+                {
+                    "condition": null,
+                    "attribute": {
+                        "@odata.type": "#microsoft.graph.sourcedAttribute",
+                        "id": "city",
+                        "source": "user",
+                        "isExtensionAttribute": false
+                    },
+                    "transformations": []
+                }
+            ]
+        }
+  ]
+}
+###
+
+
+###
+// authorizationPolicy の一覧を取得
+GET  {{graph_endpoint}}/policies/authorizationPolicy
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+###
+
+###
+// authorizationPolicy の更新
+PATCH {{graph_endpoint}}/policies/authorizationPolicy
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "blockMsolPowerShell": true,
+}
+###
+
+
+###
+// homeRealmDiscoveryPolicies を一覧表示する
+GET {{graph_endpoint}}/policies/homeRealmDiscoveryPolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// HomeRealmDiscoveryPolicy を取得する
+@homeRealmDiscoveryPolicyId1 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+GET {{graph_endpoint}}/policies/homeRealmDiscoveryPolicies/{{homeRealmDiscoveryPolicyId1}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+###
+// homerealmdiscoverypolicy 作成する
+POST  {{graph_endpoint}}/policies/homeRealmDiscoveryPolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "definition": [
+    "{\"HomeRealmDiscoveryPolicy\":{\"AllowCloudPasswordValidation\":true,\"AlternateIdLogin\":{\"Enabled\":true}}}"
+  ],
+  "displayName": "example1234",
+  "isOrganizationDefault": false
+}
+###
+
+###
+// homerealmdiscoverypolicy を更新する
+@homeRealmDiscoveryPolicyId3 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH  {{graph_endpoint}}/policies/homeRealmDiscoveryPolicies/{{homeRealmDiscoveryPolicyId3}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "definition": [
+    "{\"HomeRealmDiscoveryPolicy\":{\"AllowCloudPasswordValidation\":true,\"AlternateIdLogin\":{\"Enabled\":true}}}"
+  ],
+  "displayName": "example1234",
+  "isOrganizationDefault": true
+}
+###
+
+###
+// homerealmdiscoverypolicy を削除する
+@homeRealmDiscoveryPolicyId4 = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+DELETE  {{graph_endpoint}}/policies/homeRealmDiscoveryPolicies/{{homeRealmDiscoveryPolicyId4}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+
+###
+//  permissionGrantPolicies の一覧を取得
+GET {{graph_endpoint}}/policies/permissionGrantPolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//  permissionGrantPolicies の microsoft-user-default-recommended を取得
+GET {{graph_endpoint}}/policies/permissionGrantPolicies/microsoft-user-default-recommended
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//  permissionGrantPolicies を新しく作る
+POST {{graph_endpoint}}/policies/permissionGrantPolicies
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "id": "DemoConsent-DelegatedPermissions",
+  "displayName": "DemoConsent-DelegatedPermissions",
+  "description": "Grapn user consent to files.ReadWrite.All"
+}
+
+###
+
+###
+//  permissionGrantPolicies に include コレクションを追加する
+@permissionGrantPolicyId1 = DemoConsent-DelegatedPermissions
+POST {{graph_endpoint}}/policies/permissionGrantPolicies/{{permissionGrantPolicyId1}}/includes
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "permissionType": "delegated",
+}
+###
+
+###
+//  カスタムロールを作成し、カスタムロールに permissionGrantPolicies をアサインする
+POST {{graph_endpoint}}/roleManagement/directory/roleDefinitions
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "description": "DemoConsent-DelegatedPermissions-CustomRole",
+    "displayName": "DemoConsent-DelegatedPermissions-CustomRole",
+    "isEnabled": true,
+    "rolePermissions":
+    [
+        {
+            "allowedResourceActions":
+            [
+                "microsoft.directory/servicePrincipals/managePermissionGrantsForSelf.DemoConsent-DelegatedPermissions"
+            ]
+        }
+    ]
+}
+###
+
+###
+//同意のポリシーを削除する
+@Id1=DemoConsent-DelegatedPermissions
+DELETE  {{graph_endpoint}}/policies/permissionGrantPolicies/{{Id1}}
+Content-Type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
