@@ -120,3 +120,41 @@ Content-type: application/json
 //{"userPreferredMethodForSecondaryAuthentication":"sms"}
 ###
 
+###
+// hardwareOathTokenの一覧を取得
+GET {{graph_endpoint}}/directory/authenticationMethodDevices/hardwareOathDevices
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+###
+
+###
+// hardwareOathTokenの作成
+POST {{graph_endpoint}}/directory/authenticationMethodDevices/hardwareOathDevices
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+
+{
+  "displayName": "Token 1",
+  "serialNumber": "TOTP123456",
+  "manufacturer": "Contoso",
+  "model": "Hardware Token 1000",
+  "secretKey": "6PJ4UKIW33NNXYZAEHQNFUFTZF7WFTFB",
+  "timeIntervalInSeconds": 30,
+  "hashFunction": "hmacsha1"
+}
+###
+
+###
+// hardwareOathTokenをユーザーに割り当てる
+@hardwareOathDeviceId1 = 5xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@userId14 = 7xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+PATCH {{graph_endpoint}}/directory/authenticationMethodDevices/hardwareOathDevices/{{hardwareOathDeviceId1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+Content-type: application/json
+
+{
+  "assignTo": {
+    "id": "{{userId14}}"
+    }
+}
+###
