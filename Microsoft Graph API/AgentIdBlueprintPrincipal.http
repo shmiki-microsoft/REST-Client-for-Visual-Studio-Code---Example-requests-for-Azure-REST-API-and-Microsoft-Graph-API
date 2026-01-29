@@ -10,7 +10,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 
 ###
 //エージェント ID ブループリントプリンシパルを作成する
-@agentBlueprintAppId1=86f8f4ca-8e3d-4fd5-a0ab-fcd4f812f5d7
+@agentBlueprintAppId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 POST {{graph_endpoint}}/servicePrincipals/microsoft.graph.agentIdentityBlueprintPrincipal
 Content-type: application/json
 Authorization: Bearer {{$aadV2Token appOnly}}
