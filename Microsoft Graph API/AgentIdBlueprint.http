@@ -1,0 +1,279 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/beta
+
+###
+//エージェント ID ブループリントを作成する
+@userId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST {{graph_endpoint}}/applications/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "Test Agent ID Blueprint",
+  "sponsors@odata.bind": [
+    "https://graph.microsoft.com/beta/users/{{userId1}}"
+   ]
+}
+###
+
+###
+//エージェント ID ブループリントを作成する(スポンサーと所有者の両方指定)
+@userId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST {{graph_endpoint}}/applications/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "Test Agent ID Blueprint",
+  "sponsors@odata.bind": [
+    "https://graph.microsoft.com/beta/users/{{userId1}}"
+   ],
+    "owners@odata.bind": [
+        "https://graph.microsoft.com/v1.0/users/{{userId1}}"
+    ]
+}
+###
+###
+//エージェント ID ブループリントの一覧を取得
+GET {{graph_endpoint}}/applications/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//オブジェクト ID を使って エージェント ID ブループリントを取得
+@agentIdBlueprintObjectId1= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId1}}/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントを更新する
+@agentIdBlueprintObjectId2= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+PATCH {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId2}}/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "Updated Agent ID Blueprint"
+}
+###
+
+###
+//エージェント ID ブループリントを削除する
+@agentIdBlueprintObjectId3= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+DELETE {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId3}}/microsoft.graph.agentIdentityBlueprint
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントにクライアントシークレットを追加する
+@agentIdBlueprintObjectId4= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST  {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId4}}/microsoft.graph.agentIdentityBlueprint/addPassword
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "passwordCredential": {
+    "displayName": "Password friendly name"
+  }
+}
+###
+
+###
+//エージェント ID ブループリントからクライアントシークレットを削除する
+@agentIdBlueprintObjectId5= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@keyId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 7d
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId5}}/microsoft.graph.agentIdentityBlueprint/removePassword
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "keyId": "{{keyId}}"
+}
+###
+
+###
+//エージェント ID ブループリントのフェデレーションID資格情報の一覧を取得する
+@agentIdBlueprintObjectId6= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId6}}/federatedIdentityCredentials
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントからフェデレーションID資格情報でマネージド ID を追加する
+@agentIdBlueprintObjectId7= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@tenantId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@managedIdObjectId=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId7}}/federatedIdentityCredentials
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "name": "test01-ManagedID",
+    "issuer": "https://login.microsoftonline.com/{{tenantId}}/v2.0",
+    "subject": "{{managedIdObjectId}}",
+    "audiences": [
+        "api://AzureADTokenExchange"
+    ]
+}
+###
+
+###
+//エージェント ID ブループリントからフェデレーションID資格情報を削除する
+@agentIdBlueprintObjectId8= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@federatedIdCredentialId= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+DELETE {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId8}}/federatedIdentityCredentials/{{federatedIdCredentialId}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントの所有者を追加する  
+@agentIdBlueprintObjectId9= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@userId2=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId9}}/microsoft.graph.agentIdentityBlueprint/owners/$ref
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/{{userId2}}"
+}
+###
+
+###
+//エージェント ID ブループリントの所有者を削除する
+@agentIdBlueprintObjectId10= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@userId3=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+DELETE {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId10}}/microsoft.graph.agentIdentityBlueprint/owners/{{userId3}}/$ref
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントのスポンサーの一覧を取得する
+@agentIdBlueprintObjectId11= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId11}}/microsoft.graph.agentIdentityBlueprint/sponsors
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントのスポンサーを登録する
+@agentIdBlueprintObjectId12= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@userId4=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId12}}/microsoft.graph.agentIdentityBlueprint/sponsors/$ref
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/{{userId4}}"
+}
+###
+
+###
+//エージェント ID ブループリントのスポンサーを削除する
+@agentIdBlueprintObjectId13= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@userId5=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+DELETE {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId13}}/microsoft.graph.agentIdentityBlueprint/sponsors/{{userId5}}/$ref
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントの継承可能なアクセス許可の一覧を表示する
+@agentIdBlueprintObjectId14= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId14}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントの継承可能なアクセス許可を追加する(Graph API 全体)
+@agentIdBlueprintObjectId15= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@resourceAppId1=00000003-0000-0000-c000-000000000000
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId15}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "resourceAppId": "{{resourceAppId1}}",
+  "inheritableScopes": {
+    "@odata.type": "microsoft.graph.allAllowedScopes"
+  }
+}
+###
+
+###
+//エージェント ID ブループリントの継承可能なアクセス許可を追加する(Graph API の特定のスコープ)
+@agentIdBlueprintObjectId16= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@resourceAppId2=00000003-0000-0000-c000-000000000000
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId16}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "resourceAppId": "{{resourceAppId2}}",
+  "inheritableScopes": {
+    "@odata.type": "microsoft.graph.enumeratedScopes",
+    "scopes": [
+      "User.Read",
+      "Mail.Read"
+    ]
+  }
+}
+###
+
+###
+//エージェント ID ブループリントの継承可能なアクセス許可を禁止する(Graph API)
+@agentIdBlueprintObjectId17= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@resourceAppId3=00000003-0000-0000-c000-000000000000
+POST {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId17}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "resourceAppId": "{{resourceAppId3}}",
+  "inheritableScopes": {
+    "@odata.type": "microsoft.graph.noScopes"
+  }
+}
+###
+
+###
+//エージェント ID ブループリントの継承可能なアクセス許可を削除する
+@agentIdBlueprintObjectId18= xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@resourceAppId4=00000003-0000-0000-c000-000000000000
+DELETE {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId18}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions/{{resourceAppId4}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID ブループリントの識別子 URI とスコープを構成
+@agentIdBlueprintObjectId19=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+//id は適当に GUID 形式で自分で勝手に生成すればいい
+PATCH  {{graph_endpoint}}/applications/{{agentIdBlueprintObjectId19}}
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+    "identifierUris": ["api://{{agentIdBlueprintObjectId19}}"],
+    "api": {
+      "oauth2PermissionScopes": [
+        {
+          "adminConsentDescription": "Allow the application to access the agent on behalf of the signed-in user.",
+          "adminConsentDisplayName": "Access agent",
+          "id": "4179cc14-6dff-4dad-9f97-c2b8940e65b9",
+          "isEnabled": true,
+          "type": "User",
+          "value": "access_agent"
+        }
+      ]
+  }
+}
+###
+

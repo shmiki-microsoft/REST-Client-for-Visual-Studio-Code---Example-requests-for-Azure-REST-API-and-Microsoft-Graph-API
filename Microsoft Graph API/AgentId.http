@@ -1,0 +1,47 @@
+// Graph API のバージョン指定 v1.0 or beta
+@graph_endpoint = https://graph.microsoft.com/beta
+###
+//エージェント ID の一覧を取得
+GET {{graph_endpoint}}/servicePrincipals/microsoft.graph.agentIdentity
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+//エージェント ID の一覧を作成する(スポンサーと所有者の両方指定)
+@agentIdentityBlueprintId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+@userId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+POST {{graph_endpoint}}/servicePrincipals/microsoft.graph.agentIdentity
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "My Agent Identity Created Manually",
+  "agentIdentityBlueprintId": "{{agentIdentityBlueprintId1}}",
+  "sponsors@odata.bind": [
+    "https://graph.microsoft.com/v1.0/users/{{userId1}}"
+  ],
+  "owners@odata.bind": [
+    "https://graph.microsoft.com/v1.0/users/{{userId1}}"
+  ]
+}
+
+###
+//オブジェクト ID を指定して エージェント ID の情報を取得
+@agentIdentityId1=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+GET {{graph_endpoint}}/servicePrincipals/{{agentIdentityId1}}/microsoft.graph.agentIdentity/
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+##
+//オブジェクト ID を指定して エージェント ID の情報を更新
+@agentIdentityId2=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
+PATCH {{graph_endpoint}}/servicePrincipals/{{agentIdentityId2}}/microsoft.graph.agentIdentity
+Content-type: application/json
+Authorization: Bearer {{$aadV2Token appOnly}}
+
+{
+  "displayName": "エージェントV2 (Microsoft Copilot Studio)"
+}
+###
