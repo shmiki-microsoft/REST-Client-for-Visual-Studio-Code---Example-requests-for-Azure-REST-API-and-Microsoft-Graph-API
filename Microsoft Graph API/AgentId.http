@@ -48,13 +48,13 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 
 ###
 //オブジェクト ID を指定して エージェント ID にアクセス許可の追加を行う
-@agentIdentityId3=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+@agentIdentityId3=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx 
 POST https://graph.microsoft.com/v1.0/servicePrincipals/{{agentIdentityId3}}/appRoleAssignments
 Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
-  "principalId": "<agent-identity-id>",
+  "principalId": "{{agentIdentityId3}}",
   "resourceId": "<microsoft-graph-sp-object-id>",
   "appRoleId": "<app-role-id>"
 }
