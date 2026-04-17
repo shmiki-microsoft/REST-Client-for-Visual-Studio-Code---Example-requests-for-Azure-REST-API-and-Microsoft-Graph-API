@@ -55,7 +55,7 @@ Content-Type: application/json
 
 {
   "principalId": "{{agentIdentityId3}}",
-  "resourceId": "<microsoft-graph-sp-object-id>",
+  "resourceId": "<resource-sp-object-id>",
   "appRoleId": "<app-role-id>"
 }
 ###
