@@ -1,0 +1,99 @@
+// Microsoft Entra Agent ID - Agent User Flow (Agent's User Account Impersonation)
+// Agent ID が自身に紐づく Agent User の代理としてリソースにアクセスするフロー
+// Agent User は Exchange メールボックスや Teams グループ等、ユーザー オブジェクトが必要なシナリオで使用
+//
+// フロー概要 (3 段階のクレデンシャル チェーン):
+//   1. Blueprint が client_credentials で Exchange Token (T1) を取得
+//   2. Agent Identity が T1 を使って Agent Identity 用 Exchange Token (T2) を取得
+//   3. Agent Identity が T1 + T2 + Agent User の UPN で user_fic グラントにより Resource Token を取得
+//   4. Resource Token を使ってリソース API を呼び出す
+//
+// 前提条件:
+//   - AgentID-BlueprintSetup.http で Blueprint、SP、Agent Identity を作成済み
+//   - Agent User を作成済み (Step 5a)
+//   - Agent Identity に対象リソースの Delegated Permission が割り当て済み
+//
+// 参考:
+//   https://learn.microsoft.com/en-us/entra/agent-id/agent-user-oauth-flow
+//   https://learn.microsoft.com/en-us/entra/agent-id/agent-oauth-protocols
+
+@baseUrl = https://login.microsoftonline.com
+@tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+###
+// ================================================================
+// Step 1: Exchange Token (T1) の取得 - Blueprint → Agent Identity
+// ================================================================
+// Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
+// fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
+# @name exchangeTokenRequest_T1
+@blueprintAppId_s1 = Blueprint の appId を入力
+@blueprintClientSecret_s1 = Blueprint のクライアント シークレットを入力
+@agentIdentityAppId_s1 = Agent Identity の appId を入力
+POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{blueprintAppId_s1}}
+&scope=api://AzureADTokenExchange/.default
+&fmi_path={{agentIdentityAppId_s1}}
+&client_secret={{blueprintClientSecret_s1}}
+&grant_type=client_credentials
+###
+
+###
+// ================================================================
+// Step 2: Exchange Token (T2) の取得 - Agent Identity → Agent User
+// ================================================================
+// Agent Identity が T1 を提示して、Agent User impersonation 用の T2 を取得する
+// Entra ID は T1 の aud が Agent Identity の親 (Blueprint) であることを検証する
+# @name exchangeTokenRequest_T2
+@T1 = {{exchangeTokenRequest_T1.response.body.$.access_token}}
+@agentIdentityAppId_s2 = Agent Identity の appId を入力
+POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{agentIdentityAppId_s2}}
+&scope=api://AzureADTokenExchange/.default
+&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+&client_assertion={{T1}}
+&grant_type=client_credentials
+###
+
+###
+// ================================================================
+// Step 3: Resource Token の取得 - Agent User として
+// ================================================================
+// T1 (client_assertion) + T2 (user_federated_identity_credential) + Agent User の UPN で
+// user_fic グラントにより Agent User としての Resource Token を取得する
+//
+// client_assertion: T1 (Blueprint → Agent Identity の Exchange Token)
+// user_federated_identity_credential: T2 (Agent Identity → Agent User の Exchange Token)
+// username: Agent User の UPN
+# @name resourceTokenRequest
+@T1_s3 = {{exchangeTokenRequest_T1.response.body.$.access_token}}
+@T2 = {{exchangeTokenRequest_T2.response.body.$.access_token}}
+@agentIdentityAppId_s3 = Agent Identity の appId を入力
+@agentUserUpn_s3 = Agent User の UPN を入力 (例: test-agent-user1@yourdomain.onmicrosoft.com)
+POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{agentIdentityAppId_s3}}
+&scope=https://graph.microsoft.com/User.Read
+&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+&client_assertion={{T1_s3}}
+&user_federated_identity_credential={{T2}}
+&username={{agentUserUpn_s3}}
+&grant_type=user_fic
+&requested_token_use=on_behalf_of
+###
+
+###
+// ================================================================
+// Step 4: リソース API の呼び出し (Agent User コンテキスト)
+// ================================================================
+// 取得した Resource Token で Agent User として Microsoft Graph 等にアクセスする
+// /me エンドポイントで Agent User の情報が返ることを確認できる
+@resourceToken = {{resourceTokenRequest.response.body.$.access_token}}
+GET https://graph.microsoft.com/v1.0/me
+Authorization: Bearer {{resourceToken}}
+###

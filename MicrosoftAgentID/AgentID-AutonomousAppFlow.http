@@ -1,0 +1,70 @@
+// Microsoft Entra Agent ID - Autonomous App Flow (App-only)
+// Agent ID がユーザー コンテキストなしに自律的にリソースにアクセスするフロー
+// Blueprint の資格情報で Exchange Token (T1) を取得し、Agent Identity として Resource Token を取得する
+//
+// フロー概要:
+//   1. Blueprint が client_credentials で Exchange Token (T1) を取得
+//   2. Agent Identity が T1 を使って Resource Token (TR) を取得
+//   3. TR を使ってリソース API を呼び出す
+//
+// 前提条件:
+//   - AgentID-BlueprintSetup.http で Blueprint、SP、Agent Identity、クライアント シークレットを作成済み
+//   - Agent Identity に対象リソースの Application Permission (App Role) が割り当て済み
+//
+// 参考:
+//   https://learn.microsoft.com/en-us/entra/agent-id/agent-autonomous-app-oauth-flow
+//   https://learn.microsoft.com/en-us/entra/agent-id/agent-oauth-protocols
+
+@baseUrl = https://login.microsoftonline.com
+@tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+###
+// ================================================================
+// Step 1: Exchange Token (T1) の取得
+// ================================================================
+// Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
+// fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
+//
+// ※ 本番環境ではクライアント シークレットではなく マネージド ID (FIC) を使用すること
+# @name exchangeTokenRequest
+@blueprintAppId_t1 = Blueprint の appId を入力
+@blueprintClientSecret_t1 = Blueprint のクライアント シークレットを入力
+@agentIdentityAppId_t1 = Agent Identity の appId を入力
+POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{blueprintAppId_t1}}
+&scope=api://AzureADTokenExchange/.default
+&fmi_path={{agentIdentityAppId_t1}}
+&client_secret={{blueprintClientSecret_t1}}
+&grant_type=client_credentials
+###
+
+###
+// ================================================================
+// Step 2: Resource Token (TR) の取得
+// ================================================================
+// T1 を client_assertion として提示し、Agent Identity として Resource Token を取得する
+// scope にアクセスしたいリソースのスコープを指定する (例: Microsoft Graph)
+# @name resourceTokenRequest
+@T1 = {{exchangeTokenRequest.response.body.$.access_token}}
+@agentIdentityAppId_t2 = Agent Identity の appId を入力
+POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{agentIdentityAppId_t2}}
+&scope=https://graph.microsoft.com/.default
+&client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+&client_assertion={{T1}}
+&grant_type=client_credentials
+###
+
+###
+// ================================================================
+// Step 3: リソース API の呼び出し
+// ================================================================
+// 取得した Resource Token を使って Microsoft Graph 等のリソースにアクセスする
+@resourceToken = {{resourceTokenRequest.response.body.$.access_token}}
+GET https://graph.microsoft.com/v1.0/organization
+Authorization: Bearer {{resourceToken}}
+###
