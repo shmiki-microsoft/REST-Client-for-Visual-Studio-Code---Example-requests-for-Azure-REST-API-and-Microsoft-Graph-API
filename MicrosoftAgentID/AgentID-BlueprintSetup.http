@@ -21,6 +21,7 @@
 // 作成後のレスポンスから appId と id (Object ID) を控える
 @sponsorUserId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 POST {{graphBaseUrl}}/applications/microsoft.graph.agentIdentityBlueprint
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -39,6 +40,7 @@ Content-Type: application/json
 // 作成後、Entra 管理センター > Agent ID > Overview > Agent Blueprints に表示される
 @blueprintAppId_s2 = Step 1 で取得した appId を入力
 POST {{graphBaseUrl}}/serviceprincipals/graph.agentIdentityBlueprintPrincipal
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -50,10 +52,9 @@ Content-Type: application/json
 // ================================================================
 // Step 3: Blueprint のクライアント シークレット作成
 // ================================================================
-// MCAPS テナントではクライアント シークレットがポリシーでブロックされている場合がある
-// その場合は先に Step 3a でポリシーを緩和する
 @blueprintObjectId_s3 = Step 1 で取得した id (Object ID) を入力
 POST {{graphBaseUrl}}/applications/{{blueprintObjectId_s3}}/addPassword
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -66,34 +67,6 @@ Content-Type: application/json
 
 ###
 // ================================================================
-// Step 3a (任意): テナントのクライアント シークレット ポリシー緩和
-// ================================================================
-// 内部テナント等でクライアント シークレットがブロックされている場合に実行する
-// 注意: テナント全体のポリシーが変更される
-PATCH https://graph.microsoft.com/v1.0/policies/defaultAppManagementPolicy
-Content-Type: application/json
-
-{
-  "isEnabled": true,
-  "applicationRestrictions": {
-    "passwordCredentials": [
-      { "restrictionType": "passwordAddition", "state": "disabled" },
-      { "restrictionType": "customPasswordAddition", "state": "disabled" },
-      { "restrictionType": "symmetricKeyAddition", "state": "disabled" }
-    ]
-  }
-}
-###
-
-###
-// ================================================================
-// Step 3b (確認): 現在のポリシー設定を確認
-// ================================================================
-GET https://graph.microsoft.com/v1.0/policies/defaultAppManagementPolicy
-###
-
-###
-// ================================================================
 // Step 4: Delegated Permission の割り当て (oauth2PermissionGrants)
 // ================================================================
 // clientId: Blueprint SP の Object ID (appId ではない)
@@ -102,6 +75,7 @@ GET https://graph.microsoft.com/v1.0/policies/defaultAppManagementPolicy
 @blueprintSpObjectId_s4 = Step 2 で取得した id (SP Object ID) を入力
 @resourceSpObjectId_s4 = リソース SP の Object ID を入力 (確認用クエリで取得可能)
 POST {{graphBaseUrl}}/oauth2PermissionGrants
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -123,6 +97,7 @@ Content-Type: application/json
 @resourceSpObjectId_s4a = リソース SP の Object ID を入力 (確認用クエリで取得可能)
 @appRoleId_s4a = df021288-bdef-4463-88db-98f22de89214
 POST {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_s4a}}/appRoleAssignments
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -140,6 +115,7 @@ Content-Type: application/json
 // 参考: https://learn.microsoft.com/en-us/entra/agent-id/create-delete-agent-identities
 @blueprintAppId_s5 = Step 1 で取得した appId を入力
 POST {{graphBaseUrl}}/servicePrincipals/graph.agentIdentity
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -156,6 +132,7 @@ Content-Type: application/json
 // agentIdentityId に Agent Identity SP の Object ID を指定する
 @agentIdentitySpObjectId_s5a = Step 5 で取得した id (SP Object ID) を入力
 POST {{graphBaseUrl}}/users
+Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
@@ -176,6 +153,7 @@ Content-Type: application/json
 // 確認用クエリ: テナント内の Agent Blueprint 一覧
 // ================================================================
 GET {{graphBaseUrl}}/applications/microsoft.graph.agentIdentityBlueprint
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -184,6 +162,7 @@ GET {{graphBaseUrl}}/applications/microsoft.graph.agentIdentityBlueprint
 // ================================================================
 @blueprintAppId_q1 = Step 1 で取得した appId を入力
 GET {{graphBaseUrl}}/servicePrincipals?$filter=appId eq '{{blueprintAppId_q1}}'&$select=id,displayName,servicePrincipalType,servicePrincipalSubtype,appId
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -192,6 +171,7 @@ GET {{graphBaseUrl}}/servicePrincipals?$filter=appId eq '{{blueprintAppId_q1}}'&
 // ================================================================
 // Microsoft Graph の SP Object ID を取得する例
 GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Microsoft Graph'&$select=id,displayName,appId
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -199,6 +179,7 @@ GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Microsoft Graph'&
 // 確認用クエリ: Azure Storage の SP Object ID を取得
 // ================================================================
 GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Azure Storage'&$select=id,displayName,appId
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -207,6 +188,7 @@ GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Azure Storage'&$s
 // ================================================================
 @blueprintSpObjectId_q2 = Step 2 で取得した id (SP Object ID) を入力
 GET {{graphBaseUrl}}/oauth2PermissionGrants?$filter=clientId eq '{{blueprintSpObjectId_q2}}'
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -215,6 +197,7 @@ GET {{graphBaseUrl}}/oauth2PermissionGrants?$filter=clientId eq '{{blueprintSpOb
 // ================================================================
 @blueprintSpObjectId_q3 = Step 2 で取得した id (SP Object ID) を入力
 GET {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_q3}}/appRoleAssignments
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -224,6 +207,7 @@ GET {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_q3}}/appRoleAssignm
 // 参考: https://learn.microsoft.com/en-us/entra/agent-id/create-delete-agent-identities#delete-an-agent-identity
 @agentIdentitySpObjectId_d1 = Step 5 で取得した id (SP Object ID) を入力
 DELETE {{graphBaseUrl}}/servicePrincipals/{{agentIdentitySpObjectId_d1}}
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -232,6 +216,7 @@ DELETE {{graphBaseUrl}}/servicePrincipals/{{agentIdentitySpObjectId_d1}}
 // ================================================================
 @blueprintSpObjectId_d2 = Step 2 で取得した id (SP Object ID) を入力
 DELETE {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_d2}}
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
 ###
@@ -240,4 +225,5 @@ DELETE {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_d2}}
 // ================================================================
 @blueprintObjectId_d3 = Step 1 で取得した id (Object ID) を入力
 DELETE {{graphBaseUrl}}/applications/{{blueprintObjectId_d3}}
+Authorization: Bearer {{$aadV2Token appOnly}}
 ###

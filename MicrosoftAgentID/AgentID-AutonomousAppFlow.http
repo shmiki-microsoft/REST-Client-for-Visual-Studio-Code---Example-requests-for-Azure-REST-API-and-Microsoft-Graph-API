@@ -24,7 +24,7 @@
 // ================================================================
 // Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
 // fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
-//
+// agentIdentityAppId_t1 には Agent ID の Object ID を指定する (管理センターで確認可能)
 // ※ 本番環境ではクライアント シークレットではなく マネージド ID (FIC) を使用すること
 # @name exchangeTokenRequest
 @blueprintAppId_t1 = Blueprint の appId を入力
@@ -46,6 +46,7 @@ client_id={{blueprintAppId_t1}}
 // ================================================================
 // T1 を client_assertion として提示し、Agent Identity として Resource Token を取得する
 // scope にアクセスしたいリソースのスコープを指定する (例: Microsoft Graph)
+// agentIdentityAppId_t2 には Agent ID の Object ID を指定する (管理センターで確認可能)
 # @name resourceTokenRequest
 @T1 = {{exchangeTokenRequest.response.body.$.access_token}}
 @agentIdentityAppId_t2 = Agent Identity の appId を入力
