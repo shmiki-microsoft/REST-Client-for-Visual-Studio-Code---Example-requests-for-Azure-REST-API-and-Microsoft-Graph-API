@@ -1,101 +1,70 @@
 // Microsoft Entra Agent ID - Blueprint セットアップ
-// Agent ID の検証環境を構築するための Graph API リクエスト集
+// Agent ID の検証環境を構築するための Graph API リクエスト集 (権限割り当て・Agent User 作成・確認用クエリ・クリーンアップ)
 // すべてのリクエストは Microsoft Graph beta エンドポイントを使用する (v1.0 は未サポート)
+//
+// Blueprint・シークレット・Agent Identity の作成は Microsoft Entra 管理センターで実施する
+// 詳細は README.md を参照
 //
 // 前提条件:
 //   - Agent ID (Preview) が有効な Entra テナント
 //   - Agent AI Administrator または Agent ID Developer ロール
+//   - 管理センターで Blueprint と Agent Identity を作成済み
 //   - Graph Explorer または REST Client で beta エンドポイントにアクセス可能
+//   - Graph API 用の環境変数の設定が完了していること (リポジトリルートの README.md「環境変数を生成」セクション参照)
 //
 // 参考:
 //   https://learn.microsoft.com/en-us/entra/agent-id/
-//   https://learn.microsoft.com/en-us/entra/agent-id/identity-platform/create-blueprint?tabs=microsoft-graph-api
+//   https://learn.microsoft.com/en-us/entra/agent-id/create-blueprint?tabs=microsoft-entra-admin-center
 
 @graphBaseUrl = https://graph.microsoft.com/beta
 
+
+// ================================================================
+// Delegated Permission の割り当て継承 
+// ================================================================
 ###
-// ================================================================
-// Step 1: Agent Identity Blueprint の作成
-// ================================================================
-// sponsors にはスポンサーとなるユーザーの Object ID を指定する (必須)
-// 作成後のレスポンスから appId と id (Object ID) を控える
-@sponsorUserId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-POST {{graphBaseUrl}}/applications/microsoft.graph.agentIdentityBlueprint
+// エージェント ID ブループリントの継承可能なアクセス許可を追加する (Graph API 全体)
+@blueprintSpObjectId_s4 = AgentBlueprint の Blueprint object ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint object ID)
+@resourceAppId_s4 = リソースの appId を入力 (例: Microsoft Graph = 00000003-0000-0000-c000-000000000000)
+POST {{graphBaseUrl}}/applications/{{blueprintSpObjectId_s4}}/microsoft.graph.agentIdentityBlueprint/inheritablePermissions
+Content-type: application/json
 Authorization: Bearer {{$aadV2Token appOnly}}
-Content-Type: application/json
 
 {
-  "displayName": "Test Agent Blueprint",
-  "sponsors@odata.bind": [
-    "{{graphBaseUrl}}/users/{{sponsorUserId}}"
-  ]
-}
-###
-
-###
-// ================================================================
-// Step 2: Blueprint のサービス プリンシパル作成
-// ================================================================
-// Step 1 で取得した appId を指定する
-// 作成後、Entra 管理センター > Agent ID > Overview > Agent Blueprints に表示される
-@blueprintAppId_s2 = Step 1 で取得した appId を入力
-POST {{graphBaseUrl}}/serviceprincipals/graph.agentIdentityBlueprintPrincipal
-Authorization: Bearer {{$aadV2Token appOnly}}
-Content-Type: application/json
-
-{
-  "appId": "{{blueprintAppId_s2}}"
-}
-###
-
-###
-// ================================================================
-// Step 3: Blueprint のクライアント シークレット作成
-// ================================================================
-@blueprintObjectId_s3 = Step 1 で取得した id (Object ID) を入力
-POST {{graphBaseUrl}}/applications/{{blueprintObjectId_s3}}/addPassword
-Authorization: Bearer {{$aadV2Token appOnly}}
-Content-Type: application/json
-
-{
-  "passwordCredential": {
-    "displayName": "Test Secret for Agent Blueprint",
-    "endDateTime": "2027-04-28T23:59:59Z"
+  "resourceAppId": "{{resourceAppId_s4}}",
+  "inheritableScopes": {
+    "@odata.type": "microsoft.graph.allAllowedScopes"
   }
 }
 ###
-
 ###
 // ================================================================
-// Step 4: Delegated Permission の割り当て (oauth2PermissionGrants)
+// Delegated Permission の管理者同意 (Admin Consent URL)
 // ================================================================
-// clientId: Blueprint SP の Object ID (appId ではない)
-// resourceId: リソース SP の Object ID (例: Microsoft Graph の SP Object ID)
-// scope: スペース区切りで必要なスコープを指定
-@blueprintSpObjectId_s4 = Step 2 で取得した id (SP Object ID) を入力
-@resourceSpObjectId_s4 = リソース SP の Object ID を入力 (確認用クエリで取得可能)
-POST {{graphBaseUrl}}/oauth2PermissionGrants
-Authorization: Bearer {{$aadV2Token appOnly}}
-Content-Type: application/json
-
-{
-  "clientId": "{{blueprintSpObjectId_s4}}",
-  "consentType": "AllPrincipals",
-  "resourceId": "{{resourceSpObjectId_s4}}",
-  "principalId": null,
-  "scope": "User.Read"
-}
+// ブラウザで以下の URL を開き、管理者アカウントでサインインして同意する
+// アクセス許可の同意自体は、Agent Blueprint に対して行い、そのアクセス許可を Agent ID は継承する
+// Blueprint の client_id (appId) と対象スコープを指定
+// redirect_uri は Entra 管理センターの TokenAuthorize エンドポイント
+// 右クリック > Generate Code Snippet > PowerShell > Invoke-WebRequest
+// をクリックし、-Uri に設定されている URL をブラウザーで開いて認証する
+@tenantDomain_s4c = テナントのドメイン名を入力 (例: contoso.onmicrosoft.com)
+@blueprintAppId_s4c = AgentBlueprint の Blueprint app ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint app ID)
+GET https://login.microsoftonline.com/{{tenantDomain_s4c}}/v2.0/adminconsent
+  ?client_id={{blueprintAppId_s4c}}
+  &scope=User.Read
+  &redirect_uri=https://entra.microsoft.com/TokenAuthorize
+  &state=xyz123
 ###
 
 ###
 // ================================================================
-// Step 4a: Application Permission (App Role) の割り当て
+//  Application Permission (App Role) の割り当て
 // ================================================================
 // appRoleId は対象リソースの App Role GUID を指定
 // 例: Microsoft Graph の User.Read.All = df021288-bdef-4463-88db-98f22de89214
-@blueprintSpObjectId_s4a = Step 2 で取得した id (SP Object ID) を入力
+@blueprintSpObjectId_s4a = AgentBlueprint の Blueprint object ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint object ID)
 @resourceSpObjectId_s4a = リソース SP の Object ID を入力 (確認用クエリで取得可能)
-@appRoleId_s4a = df021288-bdef-4463-88db-98f22de89214
+@appRoleId_s4a = 割り当てる App Role の GUID を入力 (例: User.Read.All = df021288-bdef-4463-88db-98f22de89214)
 POST {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_s4a}}/appRoleAssignments
 Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
@@ -109,28 +78,44 @@ Content-Type: application/json
 
 ###
 // ================================================================
-// Step 5: Agent Identity (エージェント インスタンス) の作成
+// 識別子 URI とスコープの構成
 // ================================================================
-// Blueprint を元に個別のエージェント ID を作成する
-// 参考: https://learn.microsoft.com/en-us/entra/agent-id/create-delete-agent-identities
-@blueprintAppId_s5 = Step 1 で取得した appId を入力
-POST {{graphBaseUrl}}/servicePrincipals/graph.agentIdentity
+// ユーザーや他のエージェントからの受信要求を受け付ける場合に必要
+// identifierUris に Blueprint の appId を指定する
+// oauth2PermissionScopes の id には一意の GUID を生成して指定する
+//   PowerShell: [guid]::NewGuid()
+// 参考: https://learn.microsoft.com/ja-jp/entra/agent-id/create-blueprint?tabs=microsoft-graph-api#configure-identifier-uri-and-scope
+@blueprintObjectId_s4b = AgentBlueprint の Blueprint object ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint object ID)
+@blueprintAppId_s4b = AgentBlueprint の Blueprint app ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint app ID)
+@scopeGuid_s4b = 一意の GUID を生成して入力 (PowerShell: [guid]::NewGuid()などで適宜作成)
+PATCH {{graphBaseUrl}}/applications/{{blueprintObjectId_s4b}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
 {
-  "appId": "{{blueprintAppId_s5}}",
-  "displayName": "Test Agent Instance 1"
+  "identifierUris": ["api://{{blueprintAppId_s4b}}"],
+  "api": {
+    "oauth2PermissionScopes": [
+      {
+        "adminConsentDescription": "Allow the application to access the agent on behalf of the signed-in user.",
+        "adminConsentDisplayName": "Access agent",
+        "id": "{{scopeGuid_s4b}}",
+        "isEnabled": true,
+        "type": "User",
+        "value": "access_agent"
+      }
+    ]
+  }
 }
 ###
 
 ###
 // ================================================================
-// Step 5a: Agent User の作成 (任意)
+//  Agent User の作成 (任意)
 // ================================================================
 // Exchange メールボックスや Teams 等、ユーザー オブジェクトが必要な場合のみ
 // agentIdentityId に Agent Identity SP の Object ID を指定する
-@agentIdentitySpObjectId_s5a = Step 5 で取得した id (SP Object ID) を入力
+@agentIdentitySpObjectId_s5a = 管理センターで確認した Agent Identity の Object ID を入力
 POST {{graphBaseUrl}}/users
 Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
@@ -160,7 +145,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // 確認用クエリ: 特定の Blueprint に紐づく Agent Identity 一覧
 // ================================================================
-@blueprintAppId_q1 = Step 1 で取得した appId を入力
+@blueprintAppId_q1 = 管理センターで確認した Blueprint app ID を入力
 GET {{graphBaseUrl}}/servicePrincipals?$filter=appId eq '{{blueprintAppId_q1}}'&$select=id,displayName,servicePrincipalType,servicePrincipalSubtype,appId
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
@@ -186,7 +171,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // 確認用クエリ: 権限付与の確認 (Delegated)
 // ================================================================
-@blueprintSpObjectId_q2 = Step 2 で取得した id (SP Object ID) を入力
+@blueprintSpObjectId_q2 = 管理センターで確認した Blueprint principal object ID を入力
 GET {{graphBaseUrl}}/oauth2PermissionGrants?$filter=clientId eq '{{blueprintSpObjectId_q2}}'
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
@@ -195,7 +180,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // 確認用クエリ: 権限付与の確認 (Application)
 // ================================================================
-@blueprintSpObjectId_q3 = Step 2 で取得した id (SP Object ID) を入力
+@blueprintSpObjectId_q3 = 管理センターで確認した Blueprint principal object ID を入力
 GET {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_q3}}/appRoleAssignments
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
@@ -205,7 +190,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // クリーンアップ: Agent Identity の削除
 // ================================================================
 // 参考: https://learn.microsoft.com/en-us/entra/agent-id/create-delete-agent-identities#delete-an-agent-identity
-@agentIdentitySpObjectId_d1 = Step 5 で取得した id (SP Object ID) を入力
+@agentIdentitySpObjectId_d1 = 管理センターで確認した Agent Identity の Object ID を入力
 DELETE {{graphBaseUrl}}/servicePrincipals/{{agentIdentitySpObjectId_d1}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
@@ -214,7 +199,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // クリーンアップ: Blueprint SP の削除
 // ================================================================
-@blueprintSpObjectId_d2 = Step 2 で取得した id (SP Object ID) を入力
+@blueprintSpObjectId_d2 = 管理センターで確認した Blueprint principal object ID を入力
 DELETE {{graphBaseUrl}}/servicePrincipals/{{blueprintSpObjectId_d2}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
@@ -223,7 +208,7 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // クリーンアップ: Blueprint (Application) の削除
 // ================================================================
-@blueprintObjectId_d3 = Step 1 で取得した id (Object ID) を入力
+@blueprintObjectId_d3 = 管理センターで確認した Blueprint object ID を入力
 DELETE {{graphBaseUrl}}/applications/{{blueprintObjectId_d3}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###

@@ -8,8 +8,8 @@
 //   3. TR を使ってリソース API を呼び出す
 //
 // 前提条件:
-//   - AgentID-BlueprintSetup.http で Blueprint、SP、Agent Identity、クライアント シークレットを作成済み
-//   - Agent Identity に対象リソースの Application Permission (App Role) が割り当て済み
+//   - README の手順 1〜3 で Blueprint・クライアント シークレット・Agent Identity を管理センターで作成済み
+//   - AgentID-BlueprintSetup.http で API 権限の割り当てを実施済み
 //
 // 参考:
 //   https://learn.microsoft.com/en-us/entra/agent-id/agent-autonomous-app-oauth-flow
@@ -18,25 +18,26 @@
 @baseUrl = https://login.microsoftonline.com
 @tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
+// === 共通変数 ===
+@blueprintAppId = Blueprint の appId を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint app ID)
+@blueprintClientSecret = Blueprint のクライアント シークレットを入力
+@agentIdentityAppId = Agent Identity の app ID を入力 (Entra 管理センター > Agents > Agent identities > 対象 Agent Identity > Object ID)
+
 ###
 // ================================================================
 // Step 1: Exchange Token (T1) の取得
 // ================================================================
 // Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
 // fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
-// agentIdentityAppId_t1 には Agent ID の Object ID を指定する (管理センターで確認可能)
 // ※ 本番環境ではクライアント シークレットではなく マネージド ID (FIC) を使用すること
 # @name exchangeTokenRequest
-@blueprintAppId_t1 = Blueprint の appId を入力
-@blueprintClientSecret_t1 = Blueprint のクライアント シークレットを入力
-@agentIdentityAppId_t1 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{blueprintAppId_t1}}
+client_id={{blueprintAppId}}
 &scope=api://AzureADTokenExchange/.default
-&fmi_path={{agentIdentityAppId_t1}}
-&client_secret={{blueprintClientSecret_t1}}
+&fmi_path={{agentIdentityAppId}}
+&client_secret={{blueprintClientSecret}}
 &grant_type=client_credentials
 ###
 
@@ -46,14 +47,12 @@ client_id={{blueprintAppId_t1}}
 // ================================================================
 // T1 を client_assertion として提示し、Agent Identity として Resource Token を取得する
 // scope にアクセスしたいリソースのスコープを指定する (例: Microsoft Graph)
-// agentIdentityAppId_t2 には Agent ID の Object ID を指定する (管理センターで確認可能)
 # @name resourceTokenRequest
 @T1 = {{exchangeTokenRequest.response.body.$.access_token}}
-@agentIdentityAppId_t2 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{agentIdentityAppId_t2}}
+client_id={{agentIdentityAppId}}
 &scope=https://graph.microsoft.com/.default
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 &client_assertion={{T1}}
@@ -66,6 +65,6 @@ client_id={{agentIdentityAppId_t2}}
 // ================================================================
 // 取得した Resource Token を使って Microsoft Graph 等のリソースにアクセスする
 @resourceToken = {{resourceTokenRequest.response.body.$.access_token}}
-GET https://graph.microsoft.com/v1.0/organization
+GET https://graph.microsoft.com/v1.0/users
 Authorization: Bearer {{resourceToken}}
 ###

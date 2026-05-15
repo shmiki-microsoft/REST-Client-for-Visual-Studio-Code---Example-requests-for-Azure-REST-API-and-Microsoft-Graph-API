@@ -3,15 +3,15 @@
 // ユーザーのアクセス トークン (Tc) + Blueprint の資格情報 → Exchange Token (T1) → Resource Token
 //
 // フロー概要:
-//   1. クライアント アプリがユーザーを認証し、aud=Blueprint のアクセス トークン (Tc) を取得
-//   2. Blueprint が client_credentials で Exchange Token (T1) を取得
-//   3. Agent Identity が T1 + Tc を使って OBO でユーザー代理の Resource Token を取得
-//   4. Resource Token を使ってリソース API を呼び出す
+//   0. クライアント アプリがユーザーを認証し、aud=Blueprint のアクセス トークン (Tc) を取得
+//   1. Blueprint が client_credentials で Exchange Token (T1) を取得
+//   2. Agent Identity が T1 + Tc を使って OBO でユーザー代理の Resource Token を取得
+//   3. Resource Token を使ってリソース API を呼び出す
 //
 // 前提条件:
-//   - AgentID-BlueprintSetup.http で Blueprint、SP、Agent Identity、クライアント シークレットを作成済み
-//   - Agent Identity に対象リソースの Delegated Permission が割り当て済み
-//   - クライアント アプリから Blueprint の scope で aud=Blueprint のトークンを取得する手段があること
+//   - README の手順 1〜3 で Blueprint・クライアント シークレット・Agent Identity を管理センターで作成済み
+//   - AgentID-BlueprintSetup.http で API 権限の割り当て・識別子 URI の構成を実施済み
+//   - README の手順 4 でクライアント アプリを登録済み
 //
 // 注意:
 //   - Agent ID は /authorize エンドポイントをサポートしない (リダイレクト URI 不可)
@@ -25,52 +25,50 @@
 @baseUrl = https://login.microsoftonline.com
 @tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
+// === 共通変数 ===
+@blueprintAppId = Agent Blueprint の Blueprint app ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint app ID)
+@blueprintClientSecret = Agent Blueprint のクライアント シークレットを入力
+@agentIdentityAppId = Agent Identity の app ID を入力 (Entra 管理センター > Agents > Agent identities > 対象 Agent Identity > Object ID)
+@clientAppId = クライアント アプリの appId を入力 (README 手順 4a で控えたもの)
+@clientAppSecret = クライアント アプリのクライアント シークレットを入力
+@clientAppRedirectUri = https://jwt.ms
+
 ###
 // ================================================================
 // Step 0: ユーザー アクセス トークン (Tc) の取得 (クライアント アプリ経由)
 // ================================================================
 // Agent ID は /authorize をサポートしないため、別のクライアント アプリで
 // ユーザーを認証し、aud=Blueprint のトークンを取得する
-//
-// 方法 A: クライアント アプリの認可コードフローで scope に Blueprint の scope を指定
-//   - 認可リクエストの scope に api://{BlueprintAppId}/user_impersonation 等を指定
+//　クライアントアプリ、クライアントシークレットは、 README で作成したものを使用する
+// クライアント アプリの認可コードフローで scope に Blueprint の scope を指定
+//   - 認可リクエストの scope に api://{BlueprintAppId}/access_agent を指定
 //   - 取得した code でトークンリクエストを実行
 //
-// 方法 B: 既にクライアント アプリのトークンがある場合、
-//   そのトークンでクライアント アプリ → Blueprint への OBO を実行して Tc を取得
-//
-// 以下は方法 A の例 (クライアント アプリの認可コードフロー)
 // 右クリック > Generate Code Snippet > PowerShell > Invoke-WebRequest
 // をクリックし、-Uri に設定されている URL をブラウザーで開いて認証する
-@clientAppId_s0 = クライアント アプリの appId を入力
-@blueprintAppId_s0 = Blueprint の appId を入力
-@clientAppRedirectUri_s0 = https://jwt.ms
+
 GET {{baseUrl}}/{{tenantId}}/oauth2/v2.0/authorize
-    ?client_id={{clientAppId_s0}}
+    ?client_id={{clientAppId}}
     &response_type=code
-    &redirect_uri={{clientAppRedirectUri_s0}}
+    &redirect_uri={{clientAppRedirectUri}}
     &response_mode=query
-    &scope=openid api://{{blueprintAppId_s0}}/user_impersonation
+    &scope=openid api://{{blueprintAppId}}/access_agent
     &state=12345
 ###
 
 ###
 // Step 0 続き: 認可コードからトークンを取得
 # @name clientTokenRequest
-@clientAppId_s0b = クライアント アプリの appId を入力
-@clientAppSecret_s0b = クライアント アプリのクライアント シークレットを入力
-@blueprintAppId_s0b = Blueprint の appId を入力
-@clientAppRedirectUri_s0b = https://jwt.ms
 @code_s0b = 認可リクエストで取得した code を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{clientAppId_s0b}}
-&scope=api://{{blueprintAppId_s0b}}/user_impersonation
+client_id={{clientAppId}}
+&scope=api://{{blueprintAppId}}/access_agent
 &code={{code_s0b}}
-&redirect_uri={{clientAppRedirectUri_s0b}}
+&redirect_uri={{clientAppRedirectUri}}
 &grant_type=authorization_code
-&client_secret={{clientAppSecret_s0b}}
+&client_secret={{clientAppSecret}}
 ###
 
 ###
@@ -80,16 +78,13 @@ client_id={{clientAppId_s0b}}
 // Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
 // fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
 # @name exchangeTokenRequest
-@blueprintAppId_s1 = Blueprint の appId を入力
-@blueprintClientSecret_s1 = Blueprint のクライアント シークレットを入力
-@agentIdentityAppId_s1 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{blueprintAppId_s1}}
+client_id={{blueprintAppId}}
 &scope=api://AzureADTokenExchange/.default
-&fmi_path={{agentIdentityAppId_s1}}
-&client_secret={{blueprintClientSecret_s1}}
+&fmi_path={{agentIdentityAppId}}
+&client_secret={{blueprintClientSecret}}
 &grant_type=client_credentials
 ###
 
@@ -105,12 +100,11 @@ client_id={{blueprintAppId_s1}}
 # @name oboTokenRequest
 @T1 = {{exchangeTokenRequest.response.body.$.access_token}}
 @Tc = {{clientTokenRequest.response.body.$.access_token}}
-@agentIdentityAppId_s2 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{agentIdentityAppId_s2}}
-&scope=https://graph.microsoft.com/User.Read
+client_id={{agentIdentityAppId}}
+&scope=https://graph.microsoft.com/.default offline_access
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 &client_assertion={{T1}}
 &grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer
@@ -135,13 +129,12 @@ Authorization: Bearer {{resourceToken}}
 // OBO で取得したリフレッシュ トークンを使って新しいアクセス トークンを取得する
 # @name refreshTokenRequest
 @refreshToken = {{oboTokenRequest.response.body.$.refresh_token}}
-@T1_refresh = Exchange Token (T1) を入力 (有効期限内のもの)
-@agentIdentityAppId_rt = Agent Identity の appId を入力
+@T1_refresh = {{exchangeTokenRequest.response.body.$.access_token}}
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{agentIdentityAppId_rt}}
-&scope=https://graph.microsoft.com/User.Read
+client_id={{agentIdentityAppId}}
+&scope=https://graph.microsoft.com/.default offline_access
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 &client_assertion={{T1_refresh}}
 &grant_type=refresh_token

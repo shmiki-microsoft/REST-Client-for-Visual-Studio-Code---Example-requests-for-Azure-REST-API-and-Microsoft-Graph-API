@@ -20,6 +20,12 @@
 @baseUrl = https://login.microsoftonline.com
 @tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
+// === 共通変数 ===
+@blueprintAppId = Blueprint の appId を入力
+@blueprintClientSecret = Blueprint のクライアント シークレットを入力
+@agentIdentityAppId = Agent Identity の appId を入力
+@agentUserUpn = Agent User の UPN を入力 (例: test-agent-user1@yourdomain.onmicrosoft.com)
+
 ###
 // ================================================================
 // Step 1: Exchange Token (T1) の取得 - Blueprint → Agent Identity
@@ -27,16 +33,13 @@
 // Blueprint の資格情報で api://AzureADTokenExchange スコープのトークンを取得する
 // fmi_path に Agent Identity の appId を指定して impersonation 対象を指定する
 # @name exchangeTokenRequest_T1
-@blueprintAppId_s1 = Blueprint の appId を入力
-@blueprintClientSecret_s1 = Blueprint のクライアント シークレットを入力
-@agentIdentityAppId_s1 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{blueprintAppId_s1}}
+client_id={{blueprintAppId}}
 &scope=api://AzureADTokenExchange/.default
-&fmi_path={{agentIdentityAppId_s1}}
-&client_secret={{blueprintClientSecret_s1}}
+&fmi_path={{agentIdentityAppId}}
+&client_secret={{blueprintClientSecret}}
 &grant_type=client_credentials
 ###
 
@@ -48,11 +51,10 @@ client_id={{blueprintAppId_s1}}
 // Entra ID は T1 の aud が Agent Identity の親 (Blueprint) であることを検証する
 # @name exchangeTokenRequest_T2
 @T1 = {{exchangeTokenRequest_T1.response.body.$.access_token}}
-@agentIdentityAppId_s2 = Agent Identity の appId を入力
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{agentIdentityAppId_s2}}
+client_id={{agentIdentityAppId}}
 &scope=api://AzureADTokenExchange/.default
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
 &client_assertion={{T1}}
@@ -70,19 +72,16 @@ client_id={{agentIdentityAppId_s2}}
 // user_federated_identity_credential: T2 (Agent Identity → Agent User の Exchange Token)
 // username: Agent User の UPN
 # @name resourceTokenRequest
-@T1_s3 = {{exchangeTokenRequest_T1.response.body.$.access_token}}
 @T2 = {{exchangeTokenRequest_T2.response.body.$.access_token}}
-@agentIdentityAppId_s3 = Agent Identity の appId を入力
-@agentUserUpn_s3 = Agent User の UPN を入力 (例: test-agent-user1@yourdomain.onmicrosoft.com)
 POST {{baseUrl}}/{{tenantId}}/oauth2/v2.0/token
 Content-Type: application/x-www-form-urlencoded
 
-client_id={{agentIdentityAppId_s3}}
+client_id={{agentIdentityAppId}}
 &scope=https://graph.microsoft.com/User.Read
 &client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer
-&client_assertion={{T1_s3}}
+&client_assertion={{T1}}
 &user_federated_identity_credential={{T2}}
-&username={{agentUserUpn_s3}}
+&username={{agentUserUpn}}
 &grant_type=user_fic
 &requested_token_use=on_behalf_of
 ###

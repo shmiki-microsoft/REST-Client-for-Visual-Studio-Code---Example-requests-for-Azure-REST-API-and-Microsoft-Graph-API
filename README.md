@@ -5,6 +5,7 @@ VS Code の拡張機能 Rest Client を使って、 Azure REST API や Microsoft
 * /Azure REST API : Azure REST API のサンプルが入っています。
 * /Microsoft Graph API : Microsoft Graph API のサンプルが入っています。
 * /Microsoft Identity Platform : Microsoft Entra ID の OAuth/OIDC を勉強したい方に向けたサンプルです。 Microsoft Entra ID で OAuth / OIDC の各種認証フロー簡単に試すためのサンプルが入っています。
+* /MicrosoftAgentID : Microsoft Entra Agent ID の認証フロー (Autonomous App Flow、OBO Flow、Agent User Flow) を検証するためのサンプルが入っています。詳細は [MicrosoftAgentID/README.md](MicrosoftAgentID/README.md) を参照してください。
 
 # インストールと事前準備
 ## VSCode にて 拡張機能 REST Client for Visual Studio Code をインストール
