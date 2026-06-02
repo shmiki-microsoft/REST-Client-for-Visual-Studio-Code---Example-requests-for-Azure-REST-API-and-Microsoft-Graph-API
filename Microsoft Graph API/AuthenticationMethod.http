@@ -1,5 +1,5 @@
 // Graph API のバージョン指定 v1.0 or beta
-@graph_endpoint = https://graph.microsoft.com/v1.0
+@graph_endpoint = https://graph.microsoft.com/beta
 
 
 ###

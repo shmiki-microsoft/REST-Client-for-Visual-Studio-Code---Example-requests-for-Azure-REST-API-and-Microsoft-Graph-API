@@ -9,8 +9,8 @@
 //   4. Resource Token を使ってリソース API を呼び出す
 //
 // 前提条件:
-//   - AgentID-BlueprintSetup.http で Blueprint、SP、Agent Identity を作成済み
-//   - Agent User を作成済み (Step 5a)
+//   - README の手順 1〜3 で Blueprint・クライアント シークレット・Agent Identity を管理センターで作成済み
+//   - AgentID-Setup.http で API 権限の割り当て・Agent User の作成を実施済み
 //   - Agent Identity に対象リソースの Delegated Permission が割り当て済み
 //
 // 参考:

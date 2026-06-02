@@ -9,7 +9,7 @@
 //
 // 前提条件:
 //   - README の手順 1〜3 で Blueprint・クライアント シークレット・Agent Identity を管理センターで作成済み
-//   - AgentID-BlueprintSetup.http で API 権限の割り当てを実施済み
+//   - AgentID-Setup.http で API 権限の割り当てを実施済み
 //
 // 参考:
 //   https://learn.microsoft.com/en-us/entra/agent-id/agent-autonomous-app-oauth-flow

@@ -1,4 +1,4 @@
-// Microsoft Entra Agent ID - Blueprint セットアップ
+// Microsoft Entra Agent ID - セットアップ
 // Agent ID の検証環境を構築するための Graph API リクエスト集 (権限割り当て・Agent User 作成・確認用クエリ・クリーンアップ)
 // すべてのリクエストは Microsoft Graph beta エンドポイントを使用する (v1.0 は未サポート)
 //
