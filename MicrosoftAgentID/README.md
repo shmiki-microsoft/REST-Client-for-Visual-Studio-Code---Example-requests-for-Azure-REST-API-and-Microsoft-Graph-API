@@ -264,7 +264,27 @@ sequenceDiagram
 
 - **3 ステップ**: T1 取得 → T2 取得 → user_fic で TR 取得
 - Delegated Permission が必要
-- 管理センターまたは `AgentID-BlueprintSetup.http` の Step 5a で Agent User を作成しておくこと
+- 管理センターまたは `AgentID-BlueprintSetup.http` の Agent User の作成セクションで Agent User を作成しておくこと
+
+#### Agent User Flow の事前準備
+
+Agent User Flow では、事前に Agent User を作成する必要があります。以下の手順を完了してから `AgentID-AgentUserFlow.http` を実行してください。
+
+1. **Delegated Permission の構成** (未実施の場合)
+   - [セットアップ手順 2a. Blueprint の API 権限の割り当て](#2a-blueprint-の-api-権限の割り当て-agentid-blueprintsetuphttp) の「継承可能なアクセス許可の追加」と「Delegated Permission の管理者同意」を完了する
+   - Agent User Flow は Delegated Permission を使用するため、対象リソースのスコープ (例: `User.Read`) に対する管理者同意が必要
+
+2. **Agent User の作成** (`AgentID-BlueprintSetup.http`)
+   - `AgentID-BlueprintSetup.http` の **Agent User の作成 (任意)** セクションを実行する
+   - 以下の情報を指定する:
+     - `agentIdentitySpObjectId`: Agent Identity の Object ID (管理センター > Agents > Agent identities で確認)
+     - `displayName`: Agent User の表示名
+     - `userPrincipalName`: Agent User の UPN (例: `test-agent-user1@yourdomain.onmicrosoft.com`)
+     - `mailNickname`: メール ニックネーム
+   - `identityParentId` に Agent Identity の Object ID を指定することで、Agent User が Agent Identity に紐づけられる
+
+3. **Agent User の UPN を控える**
+   - 作成した Agent User の `userPrincipalName` を `AgentID-AgentUserFlow.http` の `agentUserUpn` 変数に設定する
 
 ## 注意事項
 

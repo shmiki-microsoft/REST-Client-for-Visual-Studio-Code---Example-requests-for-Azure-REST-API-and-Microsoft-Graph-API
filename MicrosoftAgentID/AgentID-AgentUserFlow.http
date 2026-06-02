@@ -21,9 +21,9 @@
 @tenantId = xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 // === 共通変数 ===
-@blueprintAppId = Blueprint の appId を入力
+@blueprintAppId = Agent Blueprint の Blueprint app ID を入力 (Entra 管理センター > Agents > Agent blueprints > 対象 Blueprint > Blueprint app ID)
 @blueprintClientSecret = Blueprint のクライアント シークレットを入力
-@agentIdentityAppId = Agent Identity の appId を入力
+@agentIdentityAppId = Agent Identity の app ID を入力 (Entra 管理センター > Agents > Agent identities > 対象 Agent Identity > Object ID)
 @agentUserUpn = Agent User の UPN を入力 (例: test-agent-user1@yourdomain.onmicrosoft.com)
 
 ###
