@@ -116,7 +116,7 @@ Content-Type: application/json
 // Exchange メールボックスや Teams 等、ユーザー オブジェクトが必要な場合のみ
 // agentIdentityId に Agent Identity SP の Object ID を指定する
 @agentIdentitySpObjectId_s5a = 管理センターで確認した Agent Identity の Object ID を入力
-POST {{graphBaseUrl}}/users
+POST {{graphBaseUrl}}/users/microsoft.graph.agentUser
 Authorization: Bearer {{$aadV2Token appOnly}}
 Content-Type: application/json
 
@@ -125,11 +125,7 @@ Content-Type: application/json
   "userPrincipalName": "test-agent-user1@yourdomain.onmicrosoft.com",
   "mailNickname": "test-agent-user1",
   "accountEnabled": true,
-  "passwordProfile": {
-    "forceChangePasswordNextSignIn": false,
-    "password": "placeholder"
-  },
-  "agentIdentityId": "{{agentIdentitySpObjectId_s5a}}"
+  "identityParentId": "{{agentIdentitySpObjectId_s5a}}"
 }
 ###
 
@@ -156,14 +152,6 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 // Microsoft Graph の SP Object ID を取得する例
 GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Microsoft Graph'&$select=id,displayName,appId
-Authorization: Bearer {{$aadV2Token appOnly}}
-###
-
-###
-// ================================================================
-// 確認用クエリ: Azure Storage の SP Object ID を取得
-// ================================================================
-GET {{graphBaseUrl}}/servicePrincipals?$filter=displayName eq 'Azure Storage'&$select=id,displayName,appId
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
 
@@ -210,5 +198,14 @@ Authorization: Bearer {{$aadV2Token appOnly}}
 // ================================================================
 @blueprintObjectId_d3 = 管理センターで確認した Blueprint object ID を入力
 DELETE {{graphBaseUrl}}/applications/{{blueprintObjectId_d3}}
+Authorization: Bearer {{$aadV2Token appOnly}}
+###
+
+###
+// ================================================================
+// クリーンアップ: AgentUser の削除
+// ================================================================
+@agentUserObjectId_d4 = 管理センターで確認した AgentUser object ID を入力
+DELETE {{graphBaseUrl}}/applications/{{agentUserObjectId_d4}}
 Authorization: Bearer {{$aadV2Token appOnly}}
 ###
